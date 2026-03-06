@@ -33,21 +33,21 @@
             <h3 class="text-4xl font-black text-slate-900 mt-1">{{ number_format($totalDokumen) }}</h3>
         </div>
 
-        <a href="LINK_SPREADSHEET" 
-        target="_blank" 
-        class="block bg-gradient-to-br from-slate-800 to-slate-950 p-6 rounded-3xl shadow-2xl text-white relative overflow-hidden flex items-center group hover:scale-[1.02] transition-all cursor-pointer">
-            
-            <div class="relative z-10">
-                <h3 class="text-xl font-black tracking-tight leading-tight uppercase italic">
-                    Berita Acara <br> & Pleno
-                </h3>
-                <p class="text-white/80 text-[10px] font-bold uppercase mt-2 tracking-widest italic">
-                    Buka Spreadsheet <i class="fas fa-external-link-alt ml-1"></i>
-                </p>
-            </div>
-            
-            <i class="fas fa-table absolute -bottom-4 -right-4 text-white/10 text-[8rem] transform -rotate-12 group-hover:text-white/20 transition-all"></i>
-        </a>
+     <a href="https://docs.google.com/spreadsheets/d/1Lm4GYUBY0WMxhmCKA35pJksyyD6TuX3acSixCugXsUE/edit?usp=sharing" 
+    target="_blank" 
+    class="block bg-gradient-to-br from-white via-rose-50 to-red-100 p-6 rounded-3xl shadow-lg border border-red-100/50 text-slate-800 relative overflow-hidden flex items-center group hover:scale-[1.02] transition-all cursor-pointer">
+    
+    <div class="relative z-10">
+        <h3 class="text-xl font-black tracking-tight leading-tight uppercase italic text-red-900">
+            Rekapitulasi Berita Acara <br> & Keputusan KPU Kabupaten Pasuruan
+        </h3>
+        <p class="text-red-600/70 text-[10px] font-bold uppercase mt-2 tracking-widest italic flex items-center">
+            Buka Spreadsheet <i class="fas fa-external-link-alt ml-2 text-[8px]"></i>
+        </p>
+    </div>
+    
+    <i class="fas fa-table absolute -bottom-4 -right-4 text-red-500/5 text-[8rem] transform -rotate-12 group-hover:text-red-500/10 transition-all"></i>
+</a>
     </div>
 
     {{-- Filter & Statistik Kategori (Grid 2 Kolom) --}}
