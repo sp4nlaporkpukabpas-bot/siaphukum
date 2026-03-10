@@ -6,7 +6,7 @@
                 <img src="https://upload.wikimedia.org/wikipedia/commons/4/46/KPU_Logo.svg" class="w-6 h-auto" alt="Logo">
             </div>
             <div class="overflow-hidden">
-                <h1 class="font-extrabold text-lg tracking-tighter leading-none">Siap-<span class="text-gold-400">HUKUM</span></h1>
+                <h1 class="font-extrabold text-lg tracking-tighter leading-none">SIAP-<span class="text-gold-400">HUKUM</span></h1>
                 <p class="text-[8px] text-white/40 font-bold uppercase tracking-widest mt-1">Kabupaten Pasuruan</p>
             </div>
         </div>
@@ -75,6 +75,10 @@
                             </a>
                             <a href="{{ route('documents.index') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium {{ request()->routeIs('documents.index') ? 'text-gold-400 bg-white/5' : 'text-white/50 hover:text-gold-400' }}">
                                 <i class="fas fa-file-shield text-[11px]"></i> Master Dokumen
+                            </a>
+                            {{-- MENU BARU: REKAP REGISTER --}}
+                            <a href="{{ route('rekap-register.index') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium {{ request()->routeIs('rekap-register.*') ? 'text-gold-400 bg-white/5' : 'text-white/50 hover:text-gold-400' }}">
+                                <i class="fas fa-book-bookmark text-[11px]"></i> Rekap Register
                             </a>
                         </div>
                     </details>

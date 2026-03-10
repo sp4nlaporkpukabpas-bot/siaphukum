@@ -6,6 +6,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RekapRegisterController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoleController;
 
@@ -58,6 +59,8 @@ Route::get('/documents/view-secure/{id}', [DocumentController::class, 'viewSecur
         
         // Semua Dokumen (CRUD)
         Route::resource('documents', DocumentController::class);
+        // --- TAMBAHAN BARU: Rekap Register Produk Hukum ---
+        Route::resource('rekap-register', RekapRegisterController::class);
     });
 
     // 4. ADMINISTRASI (User & Role)

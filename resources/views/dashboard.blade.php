@@ -7,7 +7,7 @@
     <div class="mb-10">
         <div class="inline-flex items-center gap-2 bg-maroon-50 text-maroon-800 text-[10px] font-black px-4 py-2 rounded-full uppercase tracking-widest border border-maroon-100 mb-4">
             <span class="w-2 h-2 bg-maroon-600 rounded-full animate-ping"></span>
-            Siap-HUKUM v1.0 • Live Monitoring
+            SIAP-HUKUM v1.0 • Live Monitoring
         </div>
         <h1 class="text-4xl font-black text-slate-900 tracking-tighter">
             Selamat Datang, <span class="text-maroon-800 italic uppercase">{{ explode(' ', $userName)[0] }}</span> 👋
@@ -16,7 +16,9 @@
     </div>
 
     {{-- Statistik Cards --}}
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 items-start">
+        
+        {{-- Card 1: Total Kategori --}}
         <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 group hover:shadow-xl transition-all">
             <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-blue-600 group-hover:text-white transition-all">
                 <i class="fas fa-layer-group text-xl"></i>
@@ -25,6 +27,7 @@
             <h3 class="text-4xl font-black text-slate-900 mt-1">{{ $totalKategori }}</h3>
         </div>
 
+        {{-- Card 2: Total Dokumen --}}
         <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 group hover:shadow-xl transition-all">
             <div class="w-12 h-12 bg-maroon-50 text-maroon-800 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-maroon-800 group-hover:text-white transition-all">
                 <i class="fas fa-file-contract text-xl"></i>
@@ -33,21 +36,32 @@
             <h3 class="text-4xl font-black text-slate-900 mt-1">{{ number_format($totalDokumen) }}</h3>
         </div>
 
-     <a href="https://docs.google.com/spreadsheets/d/1Lm4GYUBY0WMxhmCKA35pJksyyD6TuX3acSixCugXsUE/edit?usp=sharing" 
-    target="_blank" 
-    class="block bg-gradient-to-br from-white via-rose-50 to-red-100 p-6 rounded-3xl shadow-lg border border-red-100/50 text-slate-800 relative overflow-hidden flex items-center group hover:scale-[1.02] transition-all cursor-pointer">
-    
-    <div class="relative z-10">
-        <h3 class="text-xl font-black tracking-tight leading-tight uppercase italic text-red-900">
-            Rekapitulasi Berita Acara <br> & Keputusan KPU Kabupaten Pasuruan
-        </h3>
-        <p class="text-red-600/70 text-[10px] font-bold uppercase mt-2 tracking-widest italic flex items-center">
-            Buka Spreadsheet <i class="fas fa-external-link-alt ml-2 text-[8px]"></i>
-        </p>
-    </div>
-    
-    <i class="fas fa-table absolute -bottom-4 -right-4 text-red-500/5 text-[8rem] transform -rotate-12 group-hover:text-red-500/10 transition-all"></i>
-</a>
+        {{-- Card 3: Rekap Dinamis --}}
+        {{-- Hapus h-[280px], ganti dengan max-h supaya tetap rapi tapi bisa melar jika sedikit --}}
+        <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex flex-col max-h-[300px]">
+            <div class="mb-4">
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Rekapitulasi Terbaru</p>
+            </div>
+            
+            <div class="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-3">
+                @forelse($activeRekaps as $rekap)
+                    <a href="{{ $rekap->link_dokumen }}" target="_blank" 
+                    class="flex items-center gap-3 p-3 rounded-2xl bg-slate-50 border border-slate-100 hover:border-maroon-300 hover:bg-maroon-50 transition-all group">
+                        <div class="w-8 h-8 rounded-xl bg-white flex items-center justify-center text-maroon-800 shrink-0 shadow-sm">
+                            <i class="fas fa-file-pdf text-xs"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <h4 class="text-[10px] font-black text-slate-900 uppercase truncate">{{ $rekap->nama_rekap }}</h4>
+                            <p class="text-[9px] font-bold text-slate-400">TAHUN {{ $rekap->tahun }}</p>
+                        </div>
+                    </a>
+                @empty
+                    <div class="h-20 flex items-center justify-center text-center">
+                        <p class="text-[10px] text-slate-400 uppercase">Tidak ada data</p>
+                    </div>
+                @endforelse
+            </div>
+        </div>
     </div>
 
     {{-- Filter & Statistik Kategori (Grid 2 Kolom) --}}
