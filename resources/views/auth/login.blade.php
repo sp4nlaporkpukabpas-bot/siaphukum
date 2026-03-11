@@ -41,7 +41,7 @@
             <div class="relative z-10">
                 <div class="flex items-center gap-4 mb-16">
                     <div class="bg-white p-2 rounded-2xl shadow-lg">
-                        <img src="{{ asset('assets/img/logo_kpu.png') }}" class="w-10" alt="Logo KPU">
+                        <img src="{{ asset('/assets/img/siap-hukum-01.png') }}" class="w-10" alt="Logo KPU">
                     </div>
                     <div class="text-white">
                         <h1 class="font-black text-2xl tracking-tighter leading-none uppercase italic">Siap-<span class="text-yellow-400">HUKUM</span></h1>

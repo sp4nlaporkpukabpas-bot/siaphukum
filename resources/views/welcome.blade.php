@@ -22,7 +22,7 @@
     <nav class="fixed w-full z-50 bg-white/90 backdrop-blur-md border-b border-gray-100">
         <div class="max-w-7xl mx-auto px-6 lg:px-12 py-4 flex justify-between items-center">
             <div class="flex items-center gap-3">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/4/46/KPU_Logo.svg" alt="Logo KPU" class="w-10">
+                <img src="{{ asset('/assets/img/siap-hukum-01.png') }}" alt="Logo KPU" class="w-10">
                 <span class="font-black text-2xl tracking-tighter text-gray-800 uppercase">Siap-<span class="text-red-700">Hukum</span></span>
             </div>
             <a href="{{ route('login') }}" class="bg-red-700 text-white px-6 py-2.5 rounded-full font-bold hover:bg-red-800 transition shadow-lg shadow-red-200 text-sm flex items-center gap-2">

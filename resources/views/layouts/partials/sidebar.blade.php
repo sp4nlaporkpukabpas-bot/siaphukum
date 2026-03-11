@@ -1,18 +1,28 @@
-<aside class="w-72 bg-maroon-900 text-white flex-shrink-0 flex flex-col hidden md:flex shadow-2xl border-r border-white/5">
+<aside 
+    {{-- Logic transisi mobile --}}
+    :class="mobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'"
+    class="fixed inset-y-0 left-0 w-72 bg-maroon-900 text-white flex-shrink-0 flex flex-col z-[60] shadow-2xl border-r border-white/5 transition-transform duration-300 ease-in-out md:relative md:flex">
+    
     {{-- Header Logo --}}
     <div class="p-6">
-        <div class="flex items-center gap-3">
-            <div class="bg-white p-1.5 rounded-xl shadow-xl flex-shrink-0">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/4/46/KPU_Logo.svg" class="w-6 h-auto" alt="Logo">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="bg-white p-1.5 rounded-xl shadow-xl flex-shrink-0">
+                    <img src="{{ asset('/assets/img/siap-hukum-01.png') }}" class="w-6 h-auto" alt="Logo">
+                </div>
+                <div class="overflow-hidden">
+                    <h1 class="font-extrabold text-lg tracking-tighter leading-none">SIAP-<span class="text-gold-400">HUKUM</span></h1>
+                    <p class="text-[8px] text-white/40 font-bold uppercase tracking-widest mt-1">Kabupaten Pasuruan</p>
+                </div>
             </div>
-            <div class="overflow-hidden">
-                <h1 class="font-extrabold text-lg tracking-tighter leading-none">SIAP-<span class="text-gold-400">HUKUM</span></h1>
-                <p class="text-[8px] text-white/40 font-bold uppercase tracking-widest mt-1">Kabupaten Pasuruan</p>
-            </div>
+            {{-- Tombol tutup khusus mobile --}}
+            <button @click="mobileMenuOpen = false" class="md:hidden text-white/50 hover:text-white">
+                <i class="fas fa-times text-xl"></i>
+            </button>
         </div>
     </div>
 
-    <nav class="flex-1 px-3 py-2 space-y-6 overflow-y-auto">
+    <nav class="flex-1 px-3 py-2 space-y-6 overflow-y-auto custom-scrollbar">
         {{-- DASHBOARD --}}
         <div>
             <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all group {{ request()->routeIs('dashboard') ? 'bg-white/10 text-gold-400' : 'text-white/60 hover:bg-white/5' }}">
@@ -21,7 +31,7 @@
             </a>
         </div>
 
-        {{-- DOKUMEN BERDASARKAN IZIN (Akses Global) --}}
+        {{-- DOKUMEN BERDASARKAN IZIN --}}
         <div>
             <p class="px-4 text-[10px] font-black text-white/30 uppercase tracking-[0.2em] mb-2">Akses Dokumen</p>
             <div class="space-y-1">
@@ -59,7 +69,6 @@
             <div class="pt-4 border-t border-white/5">
                 <p class="px-4 text-[10px] font-black text-gold-400/50 uppercase tracking-[0.2em] mb-4">Panel Administrator</p>
                 
-                {{-- MANAJEMEN DATA --}}
                 <div class="mb-4">
                     <details class="group/dropdown" {{ request()->is('master*') ? 'open' : '' }}>
                         <summary class="flex items-center justify-between px-4 py-3 rounded-xl text-white/60 hover:bg-white/5 cursor-pointer list-none transition-all">
@@ -76,7 +85,6 @@
                             <a href="{{ route('documents.index') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium {{ request()->routeIs('documents.index') ? 'text-gold-400 bg-white/5' : 'text-white/50 hover:text-gold-400' }}">
                                 <i class="fas fa-file-shield text-[11px]"></i> Master Dokumen
                             </a>
-                            {{-- MENU BARU: REKAP REGISTER --}}
                             <a href="{{ route('rekap-register.index') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium {{ request()->routeIs('rekap-register.*') ? 'text-gold-400 bg-white/5' : 'text-white/50 hover:text-gold-400' }}">
                                 <i class="fas fa-book-bookmark text-[11px]"></i> Rekap Register
                             </a>
@@ -84,7 +92,6 @@
                     </details>
                 </div>
 
-                {{-- ADMINISTRASI --}}
                 <div>
                     <details class="group/dropdown" {{ request()->is('admin*') ? 'open' : '' }}>
                         <summary class="flex items-center justify-between px-4 py-3 rounded-xl text-white/60 hover:bg-white/5 cursor-pointer list-none transition-all">
@@ -108,7 +115,6 @@
         @endif
     </nav>
 
-    {{-- Logout Section --}}
     <div class="p-4 border-t border-white/5">
         <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">@csrf</form>
         <button onclick="event.preventDefault(); document.getElementById('logout-form').submit();" 

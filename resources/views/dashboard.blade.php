@@ -15,11 +15,11 @@
         <p class="text-slate-500 font-medium mt-2">Sistem Informasi Arsip Produk Hukum - {{ \Carbon\Carbon::now()->isoFormat('dddd, D MMMM Y') }}</p>
     </div>
 
-    {{-- Statistik Cards --}}
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 items-start">
+    {{-- Statistik Cards: Menggunakan sistem 12 kolom --}}
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-6 mb-10 items-start">
         
-        {{-- Card 1: Total Kategori --}}
-        <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 group hover:shadow-xl transition-all">
+        {{-- Card 1: Total Kategori (col-span-3) --}}
+        <div class="md:col-span-3 bg-white p-6 rounded-3xl shadow-sm border border-slate-100 group hover:shadow-xl transition-all">
             <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-blue-600 group-hover:text-white transition-all">
                 <i class="fas fa-layer-group text-xl"></i>
             </div>
@@ -27,8 +27,8 @@
             <h3 class="text-4xl font-black text-slate-900 mt-1">{{ $totalKategori }}</h3>
         </div>
 
-        {{-- Card 2: Total Dokumen --}}
-        <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 group hover:shadow-xl transition-all">
+        {{-- Card 2: Total Dokumen (col-span-3) --}}
+        <div class="md:col-span-3 bg-white p-6 rounded-3xl shadow-sm border border-slate-100 group hover:shadow-xl transition-all">
             <div class="w-12 h-12 bg-maroon-50 text-maroon-800 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-maroon-800 group-hover:text-white transition-all">
                 <i class="fas fa-file-contract text-xl"></i>
             </div>
@@ -36,9 +36,8 @@
             <h3 class="text-4xl font-black text-slate-900 mt-1">{{ number_format($totalDokumen) }}</h3>
         </div>
 
-        {{-- Card 3: Rekap Dinamis --}}
-        {{-- Hapus h-[280px], ganti dengan max-h supaya tetap rapi tapi bisa melar jika sedikit --}}
-        <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex flex-col max-h-[300px]">
+        {{-- Card 3: Rekap Dinamis (col-span-6) --}}
+        <div class="md:col-span-6 bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex flex-col max-h-[300px]">
             <div class="mb-4">
                 <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Rekapitulasi Terbaru</p>
             </div>
