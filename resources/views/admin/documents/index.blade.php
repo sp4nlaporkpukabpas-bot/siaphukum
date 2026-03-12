@@ -3,27 +3,31 @@
 
 @section('content')
 <div class="max-w-full">
-    <div class="flex justify-between items-center mb-10">
+    {{-- Container Header yang diperbaiki: flex-col untuk mobile, lg:flex-row untuk desktop --}}
+    <div class="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-6 mb-10">
         <div>
-            <h1 class="text-4xl font-black text-slate-900 tracking-tighter">Database <span class="text-maroon-800 italic">Dokumen</span></h1>
-            <p class="text-slate-500 font-medium">Manajemen seluruh arsip produk hukum Pasuruan.</p>
+            <h1 class="text-3xl md:text-4xl font-black text-slate-900 tracking-tighter">Database <span class="text-maroon-800 italic">Dokumen</span></h1>
+            <p class="text-slate-500 font-medium text-sm md:text-base">Manajemen seluruh arsip produk hukum KPU Pasuruan.</p>
         </div>
         
-        <div class="flex items-center gap-4">
-            {{-- Input Search Baru --}}
-            <div class="relative">
+        {{-- Container Search & Button: flex-wrap agar lebih fleksibel di layar medium --}}
+        <div class="flex flex-wrap items-center gap-4">
+            {{-- Input Search Baru: w-full pada mobile, lg:w-64 pada desktop --}}
+            <div class="relative w-full sm:w-auto">
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3">
                     <i class="fas fa-search text-slate-400 text-sm"></i>
                 </span>
                 <input type="text" id="searchInput" 
-                    class="block w-64 pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-2xl focus:ring-maroon-800 focus:border-maroon-800 text-sm font-medium transition-all outline-none" 
+                    class="block w-full sm:w-64 pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-2xl focus:ring-maroon-800 focus:border-maroon-800 text-sm font-medium transition-all outline-none" 
                     placeholder="Cari dokumen...">
             </div>
 
-            <a href="{{ route('documents.create') }}" class="bg-maroon-800 hover:bg-maroon-900 text-white px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-xl flex items-center gap-3">
+            <a href="{{ route('documents.create') }}" class="w-full sm:w-auto bg-maroon-800 hover:bg-maroon-900 text-white px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-xl flex items-center justify-center gap-3">
                 <i class="fas fa-upload"></i> Unggah Dokumen Baru
             </a>
         </div>
+    </div>
+</div>
     </div>
 
     <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">

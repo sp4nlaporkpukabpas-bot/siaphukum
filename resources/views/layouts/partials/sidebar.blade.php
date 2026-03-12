@@ -12,7 +12,7 @@
                 </div>
                 <div class="overflow-hidden">
                     <h1 class="font-extrabold text-lg tracking-tighter leading-none">SIAP-<span class="text-gold-400">HUKUM</span></h1>
-                    <p class="text-[8px] text-white/40 font-bold uppercase tracking-widest mt-1">Kabupaten Pasuruan</p>
+                    <p class="text-[8px] text-white/40 font-bold uppercase tracking-widest mt-1">KPU Kabupaten Pasuruan</p>
                 </div>
             </div>
             {{-- Tombol tutup khusus mobile --}}
@@ -86,7 +86,7 @@
                                 <i class="fas fa-file-shield text-[11px]"></i> Master Dokumen
                             </a>
                             <a href="{{ route('rekap-register.index') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium {{ request()->routeIs('rekap-register.*') ? 'text-gold-400 bg-white/5' : 'text-white/50 hover:text-gold-400' }}">
-                                <i class="fas fa-book-bookmark text-[11px]"></i> Rekap Register
+                                <i class="fas fa-book-bookmark text-[11px]"></i> Rekapitulasi Arsip
                             </a>
                         </div>
                     </details>

@@ -36,7 +36,7 @@
 
     <div class="mt-6 flex justify-center italic">
         <p class="text-[10px] text-slate-400 font-medium bg-slate-50 px-4 py-2 rounded-full border border-slate-100">
-            Pencetakan dan pengunduhan dinonaktifkan secara sistem untuk keamanan dokumen negara.
+            Pencetakan dan pengunduhan dinonaktifkan secara sistem untuk keamanan.
         </p>
     </div>
 </div>

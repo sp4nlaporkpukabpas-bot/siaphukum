@@ -1,12 +1,12 @@
 @extends('layouts.app')
-@section('title', 'Rekap Register Produk Hukum')
+@section('title', 'Rekapitulasi Arsip')
 
 @section('content')
 <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
     <div class="p-8 border-b border-slate-100 flex justify-between items-center text-slate-900">
         <div>
-            <h3 class="text-xl font-bold">Rekap Register Produk Hukum</h3>
-            <p class="text-sm text-slate-500">Kelola daftar dokumen rekapitulasi register tahunan.</p>
+            <h3 class="text-xl font-bold">Rekapitulasi Arsip
+            <p class="text-sm text-slate-500">Kelola daftar rekapitulasi arsip hukum.</p>
         </div>
         <button onclick="openAddModal()" class="bg-maroon-900 text-white px-6 py-3 rounded-xl text-sm font-bold shadow-lg shadow-maroon-900/20">
             <i class="fas fa-plus mr-2"></i> Tambah Rekap
