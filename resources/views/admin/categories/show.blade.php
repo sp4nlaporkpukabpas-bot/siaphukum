@@ -1,202 +1,437 @@
 @extends('layouts.app')
-@section('title', 'Kategori: ' . $category->name . ' | Siap-HUKUM')
+@section('title', $category->name . ' | Siap-HUKUM')
 
 @section('content')
 <div class="max-w-full">
-    {{-- Breadcrumb & Header --}}
-    <div class="mb-10">
-        <div class="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4">
-            <a href="{{ route('dashboard') }}" class="hover:text-maroon-800 transition-colors">Dashboard</a>
-            <i class="fas fa-chevron-right text-[8px]"></i>
-            <span class="text-maroon-800">Arsip Kategori</span>
+
+    {{-- Breadcrumb --}}
+    <div class="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest mb-5">
+        <a href="{{ route('dashboard') }}" class="hover:text-maroon-800 transition-colors">Dashboard</a>
+        <i class="fas fa-chevron-right text-[8px]"></i>
+        <span class="text-maroon-800 truncate">{{ $category->name }}</span>
+    </div>
+
+    {{-- Header --}}
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-7">
+        <div class="flex items-center gap-3">
+            <div class="w-11 h-11 bg-maroon-900 text-yellow-400 rounded-xl shadow-lg flex items-center justify-center text-lg shrink-0">
+                <i class="fas fa-folder-open"></i>
+            </div>
+            <div>
+                <h1 class="text-xl md:text-2xl font-extrabold text-slate-900 tracking-tight uppercase leading-none">
+                    {{ $category->name }}
+                </h1>
+                <p class="text-slate-500 font-medium text-xs mt-1 flex items-center gap-1.5">
+                    <i class="fas fa-file-invoice text-maroon-800 text-[10px]"></i>
+                    <span id="docCount" class="font-bold text-slate-700">{{ $documents->count() }}</span> dokumen tersedia
+                </p>
+            </div>
         </div>
 
-        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
-            <div class="flex items-center gap-4">
-                <div class="w-12 h-12 md:w-16 md:h-16 bg-maroon-900 text-yellow-400 rounded-2xl shadow-2xl flex items-center justify-center text-xl md:text-2xl border border-white/10 shrink-0">
-                    <i class="fas fa-folder-open"></i>
-                </div>
-                <div>
-                    <h1 class="text-2xl md:text-4xl font-extrabold text-slate-900 tracking-tighter leading-none uppercase">
-                        {{ $category->name }}
-                    </h1>
-                    <p class="text-slate-500 font-medium mt-2 flex items-center gap-2 text-xs md:text-sm">
-                        <i class="fas fa-file-invoice text-maroon-800"></i>
-                        Terdapat <span id="docCount" class="font-bold">{{ $documents->count() }}</span> dokumen
-                    </p>
-                </div>
-            </div>
-
-            <div class="flex flex-wrap gap-2">
-                @if($permission->pivot->can_view)
-                    <span class="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-[9px] font-black uppercase tracking-widest border border-blue-100 flex items-center gap-2">
-                        <i class="fas fa-eye"></i> View Access
-                    </span>
-                @endif
-                @if($permission->pivot->can_download)
-                    <span class="px-3 py-1.5 bg-emerald-50 text-emerald-600 rounded-lg text-[9px] font-black uppercase tracking-widest border border-emerald-100 flex items-center gap-2">
-                        <i class="fas fa-download"></i> Download Access
-                    </span>
-                @endif
-            </div>
+        {{-- Badge izin akses --}}
+        <div class="flex flex-wrap gap-2 shrink-0">
+            @if($permission->pivot->can_view)
+                <span class="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-[9px] font-black uppercase tracking-widest border border-blue-100 flex items-center gap-1.5">
+                    <i class="fas fa-eye"></i> View
+                </span>
+            @endif
+            @if($permission->pivot->can_download)
+                <span class="px-3 py-1.5 bg-emerald-50 text-emerald-600 rounded-lg text-[9px] font-black uppercase tracking-widest border border-emerald-100 flex items-center gap-1.5">
+                    <i class="fas fa-download"></i> Download
+                </span>
+            @endif
         </div>
     </div>
 
-    {{-- Search Bar --}}
-    <div class="mb-6 relative group max-w-md">
-        <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
-            <i class="fas fa-search text-slate-300 group-focus-within:text-maroon-800 transition-colors"></i>
+    {{-- Toolbar: Search + Batch --}}
+    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-5">
+
+        {{-- Search --}}
+        <div class="relative flex-1">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none">
+                <i class="fas fa-search text-slate-400 text-sm"></i>
+            </span>
+            <input type="text" id="searchInput"
+                   class="block w-full pl-10 pr-10 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-maroon-800 focus:border-maroon-800 text-sm font-medium outline-none transition-all"
+                   placeholder="Cari nama, nomor, atau tanggal...">
+            <button id="clearSearch"
+                    class="hidden absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-400 hover:text-slate-600">
+                <i class="fas fa-times-circle text-sm"></i>
+            </button>
         </div>
-        <input type="text" id="searchInput" 
-            class="w-full pl-12 pr-6 py-4 bg-white border border-slate-200 rounded-2xl shadow-sm focus:ring-4 focus:ring-maroon-50 focus:border-maroon-900 outline-none transition-all text-sm font-bold placeholder:text-slate-300 uppercase tracking-widest"
-            placeholder="Cari nama, nomor, atau tahun...">
+
+        {{-- Batch Download ZIP --}}
+        @if($permission->pivot->can_download)
+        <button id="batchDownloadBtn"
+                class="hidden items-center gap-2 px-5 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs uppercase tracking-widest transition-all shadow-sm shrink-0">
+            <i class="fas fa-file-zipper"></i>
+            Unduh ZIP (<span id="selectedCount">0</span>)
+        </button>
+        @endif
     </div>
 
-    {{-- Documents Container --}}
-    <div class="bg-white rounded-[2rem] md:rounded-[2.5rem] shadow-2xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
-        {{-- Header Tabel (Hanya muncul di Desktop) --}}
-        <div class="hidden md:block bg-slate-50 border-b border-slate-100">
-            <div class="flex items-center text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] px-8 py-6">
-                <div class="w-1/2">Nama Produk Hukum</div>
-                <div class="w-1/6 text-center">Nomor</div>
-                <div class="w-1/6 text-center">Tgl. Penetapan</div>
-                <div class="w-1/6 text-right">Aksi</div>
-            </div>
+    {{-- Info bar: hasil + select all --}}
+    <div class="flex items-center justify-between mb-3 px-1">
+        <p id="resultInfo" class="text-xs text-slate-400 font-medium"></p>
+        @if($permission->pivot->can_download)
+        <div class="flex items-center gap-2">
+            <input type="checkbox" id="selectAll" class="w-3.5 h-3.5 rounded accent-maroon-800 cursor-pointer">
+            <label for="selectAll" class="text-xs font-bold text-slate-500 cursor-pointer select-none">Pilih Semua</label>
+        </div>
+        @endif
+    </div>
+
+    {{-- Document List --}}
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+
+        {{-- Desktop Header --}}
+        <div class="hidden md:grid bg-slate-50 border-b border-slate-100 px-6 py-3 text-[10px] font-black text-slate-400 uppercase tracking-widest
+            {{ $permission->pivot->can_download ? 'grid-cols-12' : 'grid-cols-11' }}">
+            @if($permission->pivot->can_download)
+            <div class="col-span-1 text-center"><span class="sr-only">Pilih</span></div>
+            @endif
+            <div class="{{ $permission->pivot->can_download ? 'col-span-6' : 'col-span-7' }}">Nama Produk Hukum</div>
+            <div class="col-span-2 text-center">Nomor</div>
+            <div class="col-span-2 text-center">Tgl. Penetapan</div>
+            <div class="col-span-1 text-right">Aksi</div>
         </div>
 
-        <div class="divide-y divide-slate-100">
+        <div class="divide-y divide-slate-50" id="docList">
             @forelse($documents as $doc)
-                <div class="document-row hover:bg-maroon-50/30 transition-all group p-6 md:px-8 md:py-6">
-                    {{-- Grid System: 1 Kolom di Mobile, Flex Row di Desktop --}}
-                    <div class="flex flex-col md:flex-row md:items-center gap-4 md:gap-0">
-                        
-                        {{-- Nama Produk Hukum --}}
-                        <div class="md:w-1/2 flex items-start gap-4">
-                            <div class="mt-1 w-10 h-10 shrink-0 bg-slate-100 text-slate-400 rounded-xl flex items-center justify-center group-hover:bg-maroon-900 group-hover:text-yellow-400 transition-all">
-                                <i class="fas fa-file-pdf"></i>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <p class="font-bold text-sm md:text-base text-slate-800 leading-snug group-hover:text-maroon-900 transition-colors italic search-target">
-                                    {{ $doc->name }}
-                                </p>
-                                @if($doc->parent_id)
-                                    <div class="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1">
-                                        <span class="text-[9px] font-black text-maroon-700 uppercase tracking-tighter shrink-0 flex items-center gap-1">
-                                            <i class="fas fa-link text-[8px]"></i> Lampiran:
-                                        </span>
-                                        <span class="text-[10px] text-slate-500 font-bold search-target">{{ $doc->parent->name }}</span>
-                                        <span class="font-mono bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100 text-[9px] text-slate-400 search-target">
-                                            {{ $doc->parent->document_number }}
-                                        </span>
-                                    </div>
-                                @endif
-                            </div>
+            {{-- 
+                SATU checkbox per dokumen, disimpan di data-attribute row.
+                Mobile & desktop layout berbagi nilai dari checkbox yang SAMA
+                via JavaScript — tidak ada duplikasi elemen input.
+            --}}
+            <div class="document-row hover:bg-slate-50/70 transition-all group"
+                 data-id="{{ $doc->id }}"
+                 data-search="{{ strtolower($doc->name . ' ' . $doc->document_number . ' ' . $doc->document_date->translatedFormat('d F Y')) }}">
+
+                {{-- ── MOBILE LAYOUT ─────────────────────────────────── --}}
+                <div class="flex md:hidden items-start gap-3 p-4">
+
+                    @if($permission->pivot->can_download)
+                    {{-- Checkbox representatif — satu-satunya checkbox nyata per row --}}
+                    <input type="checkbox"
+                           class="doc-checkbox mt-1 w-3.5 h-3.5 rounded accent-maroon-800 cursor-pointer shrink-0"
+                           value="{{ $doc->id }}">
+                    @endif
+
+                    <div class="w-9 h-9 bg-red-50 text-red-400 rounded-xl flex items-center justify-center shrink-0 group-hover:bg-red-500 group-hover:text-white transition-all mt-0.5">
+                        <i class="fas fa-file-pdf text-sm"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="font-bold text-sm text-slate-800 leading-snug">{{ $doc->name }}</p>
+                        @if($doc->parent_id)
+                            <p class="text-[9px] text-maroon-600 font-black uppercase mt-0.5 flex items-center gap-1">
+                                <i class="fas fa-link text-[8px]"></i>
+                                Lampiran: <span class="normal-case font-bold">{{ Str::limit($doc->parent->name, 30) }}</span>
+                            </p>
+                        @endif
+                        <div class="flex flex-wrap gap-x-3 gap-y-0.5 mt-1.5">
+                            <span class="font-mono text-[10px] text-slate-400 font-bold">{{ $doc->document_number }}</span>
+                            <span class="text-[10px] text-slate-400 font-medium">
+                                {{ $doc->document_date->translatedFormat('d F Y') }}
+                            </span>
                         </div>
-
-                        {{-- Metadata Section (Nomor & Tanggal) --}}
-                        <div class="flex flex-row md:contents gap-4">
-                            {{-- Nomor --}}
-                            <div class="flex-1 md:w-1/6 md:text-center">
-                                <span class="block md:hidden text-[9px] font-black text-slate-400 uppercase mb-1">Nomor</span>
-                                <span class="inline-block bg-slate-50 md:bg-transparent px-2 md:px-0 py-1 rounded text-[11px] font-mono font-bold text-slate-500 border border-slate-100 md:border-0 search-target">
-                                    {{ $doc->document_number }}
-                                </span>
-                            </div>
-
-                            {{-- Tgl. Penetapan --}}
-                            <div class="flex-1 md:w-1/6 md:text-center">
-                                <span class="block md:hidden text-[9px] font-black text-slate-400 uppercase mb-1">Penetapan</span>
-                                <span class="text-xs font-bold text-slate-600 search-target">
-                                    {{ $doc->document_date->format('d M Y') }}
-                                </span>
-                            </div>
-                        </div>
-
-                        {{-- Aksi --}}
-                        <div class="md:w-1/6 flex justify-end gap-2 border-t border-slate-50 md:border-0 pt-4 md:pt-0">
+                        <div class="flex gap-1.5 mt-3">
                             @if($permission->pivot->can_view)
-                                <a href="{{ route('documents.preview', $doc->id) }}" 
-                                   class="p-2.5 bg-white text-slate-400 border border-slate-200 rounded-xl hover:bg-maroon-900 hover:text-white transition-all shadow-sm flex items-center justify-center"
-                                   title="Pratinjau">
-                                    <i class="fas fa-eye text-sm"></i>
-                                </a>
+                            <a href="{{ route('documents.preview', $doc->id) }}"
+                               class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 text-slate-600 rounded-lg text-[10px] font-bold hover:bg-maroon-900 hover:text-white transition-all">
+                                <i class="fas fa-eye text-[10px]"></i> Pratinjau
+                            </a>
                             @endif
-
                             @if($permission->pivot->can_download)
-                                <a href="{{ route('documents.download', $doc->id) }}" 
-                                   class="p-2.5 bg-maroon-900 text-yellow-400 rounded-xl hover:bg-black transition-all shadow-sm flex items-center justify-center"
-                                   title="Unduh">
-                                    <i class="fas fa-download text-sm"></i>
-                                </a>
+                            <a href="{{ route('documents.download', $doc->id) }}"
+                               class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-600 rounded-lg text-[10px] font-bold hover:bg-emerald-600 hover:text-white transition-all">
+                                <i class="fas fa-download text-[10px]"></i> Unduh
+                            </a>
                             @endif
                         </div>
                     </div>
                 </div>
-            @empty
-                <div id="emptyState" class="px-8 py-20 text-center">
-                    <div class="flex flex-col items-center opacity-20">
-                        <i class="fas fa-folder-open text-6xl mb-4 text-slate-400"></i>
-                        <p class="font-black uppercase tracking-[0.3em] text-xs text-slate-500">Tidak ada dokumen tersedia</p>
+
+                {{-- ── DESKTOP LAYOUT ────────────────────────────────── --}}
+                {{-- Checkbox di desktop adalah VISUAL PROXY — dikendalikan JS, bukan input nyata --}}
+                <div class="hidden md:grid items-center px-6 py-4 gap-2
+                    {{ $permission->pivot->can_download ? 'grid-cols-12' : 'grid-cols-11' }}">
+
+                    @if($permission->pivot->can_download)
+                    <div class="col-span-1 flex justify-center">
+                        {{-- Proxy visual: klik ini toggle checkbox asli (mobile) via JS --}}
+                        <span class="desktop-checkbox-proxy w-3.5 h-3.5 rounded border-2 border-slate-300 flex items-center justify-center cursor-pointer transition-all"
+                              data-for="{{ $doc->id }}">
+                        </span>
+                    </div>
+                    @endif
+
+                    {{-- Nama --}}
+                    <div class="{{ $permission->pivot->can_download ? 'col-span-6' : 'col-span-7' }} flex items-center gap-3">
+                        <div class="w-9 h-9 bg-red-50 text-red-400 rounded-xl flex items-center justify-center shrink-0 group-hover:bg-red-500 group-hover:text-white transition-all">
+                            <i class="fas fa-file-pdf text-sm"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <p class="font-bold text-sm text-slate-800 leading-snug truncate group-hover:text-maroon-900 transition-colors">
+                                {{ $doc->name }}
+                            </p>
+                            @if($doc->parent_id)
+                                <p class="text-[9px] text-maroon-600 font-black uppercase mt-0.5 flex items-center gap-1">
+                                    <i class="fas fa-link text-[8px]"></i>
+                                    Lampiran: <span class="normal-case font-bold text-slate-500">{{ Str::limit($doc->parent->name, 35) }}</span>
+                                </p>
+                            @endif
+                        </div>
+                    </div>
+
+                    {{-- Nomor --}}
+                    <div class="col-span-2 text-center">
+                        <span class="font-mono text-[11px] font-bold text-slate-500">{{ $doc->document_number }}</span>
+                    </div>
+
+                    {{-- Tanggal --}}
+                    <div class="col-span-2 text-center">
+                        <span class="text-xs font-semibold text-slate-600">
+                            {{ $doc->document_date->translatedFormat('d F Y') }}
+                        </span>
+                    </div>
+
+                    {{-- Aksi --}}
+                    <div class="col-span-1 flex justify-end gap-1.5">
+                        @if($permission->pivot->can_view)
+                        <a href="{{ route('documents.preview', $doc->id) }}" title="Pratinjau"
+                           class="w-8 h-8 bg-slate-100 text-slate-500 rounded-lg flex items-center justify-center hover:bg-maroon-900 hover:text-white transition-all">
+                            <i class="fas fa-eye text-xs"></i>
+                        </a>
+                        @endif
+                        @if($permission->pivot->can_download)
+                        <a href="{{ route('documents.download', $doc->id) }}" title="Unduh"
+                           class="w-8 h-8 bg-emerald-50 text-emerald-600 rounded-lg flex items-center justify-center hover:bg-emerald-600 hover:text-white transition-all">
+                            <i class="fas fa-download text-xs"></i>
+                        </a>
+                        @endif
                     </div>
                 </div>
-            @endforelse
-            
-            <div id="noResults" class="hidden px-8 py-20 text-center">
-                <div class="flex flex-col items-center">
-                    <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
-                        <i class="fas fa-search text-slate-300 text-2xl"></i>
-                    </div>
-                    <p class="font-black uppercase tracking-[0.2em] text-[10px] text-slate-400">Dokumen tidak ditemukan</p>
-                    <button onclick="resetSearch()" class="mt-4 text-maroon-800 font-black text-[9px] uppercase tracking-widest hover:underline">Hapus Pencarian</button>
-                </div>
+
             </div>
+            @empty
+            <div class="px-8 py-16 text-center">
+                <i class="fas fa-folder-open text-slate-200 text-4xl mb-3 block"></i>
+                <p class="text-slate-400 font-medium text-sm">Tidak ada dokumen dalam kategori ini.</p>
+            </div>
+            @endforelse
+        </div>
+
+        {{-- Not Found State --}}
+        <div id="noResults" class="hidden px-8 py-16 text-center">
+            <i class="fas fa-search text-slate-200 text-4xl mb-3 block"></i>
+            <p class="text-slate-500 font-medium text-sm">Dokumen tidak ditemukan.</p>
+            <button onclick="resetSearch()"
+                    class="mt-3 text-maroon-800 font-black text-xs uppercase tracking-widest hover:underline">
+                Hapus Pencarian
+            </button>
+        </div>
+
+        {{-- Footer --}}
+        <div class="border-t border-slate-100 px-6 py-3 bg-slate-50/50 flex items-center justify-between">
+            <p class="text-xs text-slate-400 font-medium">
+                Total: <span id="docCountFooter" class="font-black text-slate-600">{{ $documents->count() }}</span> dokumen
+            </p>
+            @if($permission->pivot->can_download)
+            <p class="text-[10px] text-slate-400 hidden sm:block">Centang dokumen lalu klik "Unduh ZIP" untuk batch download</p>
+            @endif
         </div>
     </div>
 </div>
 
+{{-- Form tersembunyi untuk batch ZIP (POST ke server) --}}
+@if($permission->pivot->can_download)
+<form id="batchDownloadForm" action="{{ route('documents.batch-download') }}" method="POST" class="hidden">
+    @csrf
+    <div id="batchIdsContainer"></div>
+</form>
+@endif
+
+{{-- Toast --}}
+<div id="batchToast"
+     class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-slate-900 text-white px-6 py-3 rounded-2xl shadow-2xl items-center gap-3 text-sm font-medium">
+    <i class="fas fa-spinner fa-spin text-yellow-400"></i>
+    <span id="batchToastText">Menyiapkan arsip ZIP...</span>
+</div>
+
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const searchInput = document.getElementById('searchInput');
-        const rows = document.querySelectorAll('.document-row');
-        const noResults = document.getElementById('noResults');
-        const docCountLabel = document.getElementById('docCount');
+document.addEventListener('DOMContentLoaded', function () {
+    const searchInput     = document.getElementById('searchInput');
+    const clearBtn        = document.getElementById('clearSearch');
+    const noResults       = document.getElementById('noResults');
+    const docCount        = document.getElementById('docCount');
+    const docCountFooter  = document.getElementById('docCountFooter');
+    const resultInfo      = document.getElementById('resultInfo');
+    const selectAll       = document.getElementById('selectAll');
+    const batchBtn        = document.getElementById('batchDownloadBtn');
+    const selectedCountEl = document.getElementById('selectedCount');
+    const batchForm       = document.getElementById('batchDownloadForm');
+    const batchContainer  = document.getElementById('batchIdsContainer');
+    const batchToast      = document.getElementById('batchToast');
+    const batchToastText  = document.getElementById('batchToastText');
+    const rows            = Array.from(document.querySelectorAll('.document-row'));
+    const totalCount      = rows.length;
 
-        searchInput.addEventListener('input', function() {
-            const query = this.value.toLowerCase().trim();
-            let visibleCount = 0;
+    // ── HELPER: satu checkbox nyata per row (ada di blok mobile) ─────────────
+    // Mengambil checkbox berdasarkan data-id row, bukan querySelectorAll yang
+    // bisa mengambil duplikat dari kedua blok mobile+desktop.
+    function getCheckboxForRow(row) {
+        // Checkbox asli selalu ada di blok mobile (.doc-checkbox)
+        return row.querySelector('.doc-checkbox');
+    }
 
-            rows.forEach(row => {
-                const targets = row.querySelectorAll('.search-target');
-                let match = false;
-                
-                targets.forEach(t => {
-                    if (t.textContent.toLowerCase().includes(query)) {
-                        match = true;
-                    }
-                });
+    function getAllCheckboxes() {
+        // Hanya ambil checkbox dari baris yang tidak hidden
+        return rows
+            .filter(r => !r.classList.contains('hidden'))
+            .map(r => getCheckboxForRow(r))
+            .filter(Boolean);
+    }
 
-                if (match) {
-                    row.classList.remove('hidden');
-                    visibleCount++;
-                } else {
-                    row.classList.add('hidden');
-                }
-            });
+    function getCheckedBoxes() {
+        return getAllCheckboxes().filter(cb => cb.checked);
+    }
 
-            if (visibleCount === 0 && query !== "") {
-                noResults.classList.remove('hidden');
-            } else {
-                noResults.classList.add('hidden');
-            }
-            docCountLabel.textContent = visibleCount;
+    // ── PROXY VISUAL DESKTOP ─────────────────────────────────────────────────
+    // Span di desktop bukan <input>, jadi kita sync tampilannya ke checkbox asli.
+    function syncProxyVisual(checkbox) {
+        const docId = checkbox.value;
+        const proxy = document.querySelector(`.desktop-checkbox-proxy[data-for="${docId}"]`);
+        if (!proxy) return;
+        if (checkbox.checked) {
+            proxy.classList.add('bg-maroon-800', 'border-maroon-800');
+            proxy.innerHTML = '<svg class="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>';
+        } else {
+            proxy.classList.remove('bg-maroon-800', 'border-maroon-800');
+            proxy.innerHTML = '';
+        }
+    }
+
+    function syncAllProxies() {
+        rows.forEach(row => {
+            const cb = getCheckboxForRow(row);
+            if (cb) syncProxyVisual(cb);
         });
+    }
+
+    // Klik proxy desktop → toggle checkbox asli
+    document.getElementById('docList').addEventListener('click', function (e) {
+        const proxy = e.target.closest('.desktop-checkbox-proxy');
+        if (!proxy) return;
+        const docId = proxy.dataset.for;
+        const cb    = document.querySelector(`.doc-checkbox[value="${docId}"]`);
+        if (cb) {
+            cb.checked = !cb.checked;
+            syncProxyVisual(cb);
+            updateSelectAllState();
+        }
     });
 
-    function resetSearch() {
-        const searchInput = document.getElementById('searchInput');
-        searchInput.value = '';
-        searchInput.dispatchEvent(new Event('input'));
-        searchInput.focus();
+    // ── BATCH BUTTON ─────────────────────────────────────────────────────────
+    function updateBatchButton() {
+        if (!batchBtn) return;
+        const n = getCheckedBoxes().length;
+        if (selectedCountEl) selectedCountEl.textContent = n;
+        batchBtn.classList.toggle('hidden', n === 0);
+        batchBtn.classList.toggle('flex',   n > 0);
     }
+
+    function updateSelectAllState() {
+        if (!selectAll) return;
+        const visible = getAllCheckboxes();
+        const checked = visible.filter(cb => cb.checked);
+        selectAll.indeterminate = checked.length > 0 && checked.length < visible.length;
+        selectAll.checked       = visible.length > 0 && checked.length === visible.length;
+        updateBatchButton();
+    }
+
+    // Perubahan pada checkbox asli (mobile atau programatik)
+    document.getElementById('docList').addEventListener('change', function (e) {
+        if (e.target.classList.contains('doc-checkbox')) {
+            syncProxyVisual(e.target);
+            updateSelectAllState();
+        }
+    });
+
+    // Pilih Semua
+    selectAll?.addEventListener('change', function () {
+        getAllCheckboxes().forEach(cb => { cb.checked = selectAll.checked; });
+        syncAllProxies();
+        updateBatchButton();
+    });
+
+    // ── SEARCH ───────────────────────────────────────────────────────────────
+    function filterRows() {
+        const query = searchInput.value.toLowerCase().trim();
+        let found = 0;
+
+        rows.forEach(row => {
+            const match = !query || (row.dataset.search || '').includes(query);
+            row.classList.toggle('hidden', !match);
+            if (match) found++;
+        });
+
+        const displayN = query ? found : totalCount;
+        if (docCount)       docCount.textContent       = displayN;
+        if (docCountFooter) docCountFooter.textContent = displayN;
+
+        noResults.classList.toggle('hidden', found > 0 || !query);
+        clearBtn.classList.toggle('hidden', !searchInput.value);
+        resultInfo.textContent = query ? `Menampilkan ${found} dari ${totalCount} dokumen` : '';
+
+        updateSelectAllState();
+    }
+
+    searchInput.addEventListener('input', filterRows);
+    clearBtn?.addEventListener('click', () => { searchInput.value = ''; filterRows(); searchInput.focus(); });
+
+    window.resetSearch = function () {
+        searchInput.value = '';
+        filterRows();
+        searchInput.focus();
+    };
+
+    // ── BATCH DOWNLOAD → server ZIP ──────────────────────────────────────────
+    batchBtn?.addEventListener('click', function () {
+        const checked = getCheckedBoxes();
+        if (!checked.length) return;
+
+        // 1 dokumen → download langsung tanpa ZIP
+        if (checked.length === 1) {
+            window.location.href = `{{ url('documents') }}/${checked[0].value}/download`;
+            return;
+        }
+
+        // Multiple → POST ke server, server kembalikan .zip
+        batchContainer.innerHTML = '';
+        checked.forEach(cb => {
+            const inp = document.createElement('input');
+            inp.type  = 'hidden';
+            inp.name  = 'ids[]';
+            inp.value = cb.value;
+            batchContainer.appendChild(inp);
+        });
+
+        showToast(`Menyiapkan ZIP untuk ${checked.length} dokumen...`);
+        batchForm.submit();
+        setTimeout(hideToast, 5000);
+    });
+
+    function showToast(msg) {
+        if (!batchToast) return;
+        batchToastText.textContent = msg;
+        batchToast.classList.remove('hidden');
+        batchToast.classList.add('flex');
+    }
+    function hideToast() {
+        if (!batchToast) return;
+        batchToast.classList.add('hidden');
+        batchToast.classList.remove('flex');
+    }
+});
 </script>
 @endsection

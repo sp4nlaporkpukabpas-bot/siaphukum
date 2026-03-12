@@ -34,45 +34,47 @@ Route::middleware('guest')->group(function () {
 */
 
 Route::middleware(['auth'])->group(function () {
-    
-    // 1. DASHBOARD
+
+    // ── DASHBOARD ────────────────────────────────────────────────────────────
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+    // ── PROFIL & AKUN ────────────────────────────────────────────────────────
     Route::get('/profile/password', [ProfileController::class, 'editPassword'])->name('password.edit');
     Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('password.update');
+    Route::post('/switch-role', [ProfileController::class, 'switchRole'])->name('role.switch');
 
-    Route::post('/switch-role', [ProfileController::class, 'switchRole'])->name('role.switch')->middleware('auth');
-
-    // 2. KATEGORI DOKUMEN (Menu Dinamis di Sidebar)
-    // Menampilkan isi dokumen berdasarkan kategori tertentu
+    // ── AKSES DOKUMEN (Sidebar Kategori) ────────────────────────────────────
     Route::get('/kategori/{id}/lihat', [CategoryController::class, 'show'])->name('categories.show');
+
+    // PENTING: Route eksplisit dokumen harus didaftarkan SEBELUM resource
+    // agar tidak tertimpa oleh pola {document} milik resource.
     Route::get('/documents/{document}/download', [DocumentController::class, 'download'])
          ->name('documents.download');
-    // Cari di bagian Protected Routes
-Route::get('/documents/preview/{id}', [DocumentController::class, 'preview'])->name('documents.preview');
-Route::get('/documents/view-secure/{id}', [DocumentController::class, 'viewSecure'])->name('documents.view-secure');
 
-    // 3. MANAJEMEN DATA (Data Master)
+    // Batch download: POST karena mengirim array ID via form/fetch
+    Route::post('/documents/batch-download', [DocumentController::class, 'batchDownload'])
+         ->name('documents.batch-download');
+
+    // Preview & Secure View (akses langsung, di luar prefix master)
+    Route::get('/documents/preview/{id}', [DocumentController::class, 'preview'])
+         ->name('documents.preview');
+    Route::get('/documents/view-secure/{id}', [DocumentController::class, 'viewSecure'])
+         ->name('documents.view-secure');
+
+    // ── DATA MASTER ──────────────────────────────────────────────────────────
     Route::prefix('master')->group(function () {
-        // Kelola Kategori (CRUD)
         Route::resource('categories', CategoryController::class);
-        
-        // Semua Dokumen (CRUD)
         Route::resource('documents', DocumentController::class);
-        // --- TAMBAHAN BARU: Rekap Register Produk Hukum ---
         Route::resource('rekap-register', RekapRegisterController::class);
     });
 
-    // 4. ADMINISTRASI (User & Role)
+    // ── ADMINISTRASI ─────────────────────────────────────────────────────────
     Route::prefix('admin')->group(function () {
-        // Manajemen User
         Route::resource('users', UserController::class)->except(['create', 'edit', 'show']);
-        
-        // Manajemen Role (Hak Akses)
         Route::get('/roles', [RoleController::class, 'index'])->name('roles.index');
         Route::put('/roles/{id}', [RoleController::class, 'update'])->name('roles.update');
     });
 
-    // LOGOUT
+    // ── LOGOUT ───────────────────────────────────────────────────────────────
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });
