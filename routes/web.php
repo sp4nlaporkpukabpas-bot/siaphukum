@@ -16,14 +16,19 @@ use App\Http\Controllers\RoleController;
 |--------------------------------------------------------------------------
 */
 
-Route::get('/', function () {
-    return view('welcome');
-})->name('welcome');
-
+// Landing page sekaligus halaman login (view tunggal: welcome.blade.php)
 Route::middleware('guest')->group(function () {
+    Route::get('/', function () {
+        return view('welcome');
+    })->name('welcome');
+
+    // Alias /login → tampilkan view yang sama (welcome)
+    // sehingga redirect()->intended('dashboard') dan back() tetap bekerja
     Route::get('/login', function () {
-        return view('auth.login');
+        return view('welcome');
     })->name('login');
+
+    // Proses form login (POST)
     Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 });
 
@@ -46,18 +51,16 @@ Route::middleware(['auth'])->group(function () {
     // ── AKSES DOKUMEN (Sidebar Kategori) ────────────────────────────────────
     Route::get('/kategori/{id}/lihat', [CategoryController::class, 'show'])->name('categories.show');
 
-    // PENTING: Route eksplisit dokumen harus didaftarkan SEBELUM resource
-    // agar tidak tertimpa oleh pola {document} milik resource.
+    // Route eksplisit dokumen didaftarkan SEBELUM resource
     Route::get('/documents/{document}/download', [DocumentController::class, 'download'])
          ->name('documents.download');
 
-    // Batch download: POST karena mengirim array ID via form/fetch
     Route::post('/documents/batch-download', [DocumentController::class, 'batchDownload'])
          ->name('documents.batch-download');
 
-    // Preview & Secure View (akses langsung, di luar prefix master)
     Route::get('/documents/preview/{id}', [DocumentController::class, 'preview'])
          ->name('documents.preview');
+
     Route::get('/documents/view-secure/{id}', [DocumentController::class, 'viewSecure'])
          ->name('documents.view-secure');
 
