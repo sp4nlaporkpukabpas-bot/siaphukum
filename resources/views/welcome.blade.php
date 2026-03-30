@@ -347,7 +347,7 @@ footer{
         <div class="tag-dot"></div>
         Arsip Dokumen Hukum · KPU Kab. Pasuruan
       </div>
-      <h1>Sistem Arsip<br>Produk <span class="accent">Hukum.</span></h1>
+      <h1>Sistem Informasi Arsip<br>Produk <span class="accent">Hukum.</span></h1>
       <p class="hero-sub">
         Platform manajemen arsip digital untuk KPU Kabupaten Pasuruan.
         Cepat, aman, dan mudah diakses oleh seluruh pegawai yang berwenang.
