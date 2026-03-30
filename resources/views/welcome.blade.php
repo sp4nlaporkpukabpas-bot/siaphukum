@@ -71,12 +71,12 @@ nav{
   position:fixed;top:0;left:0;right:0;z-index:100;
   height:60px;display:flex;align-items:center;
   padding:0 clamp(20px,5vw,60px);
-  background:rgba(9,9,11,.7);
+  background:rgba(255,255,255,.75);
   backdrop-filter:blur(24px) saturate(1.8);
   border-bottom:1px solid var(--border);
   transition:all .3s;
 }
-[data-theme="light"] nav{background:rgba(255,255,255,.75);}
+[data-theme="dark"] nav{background:rgba(9,9,11,.7);}
 .nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
 .nav-logo img{width:30px;height:30px;object-fit:contain}
 .logo-name{font-size:.95rem;font-weight:800;letter-spacing:-.02em;color:var(--text)}
@@ -147,12 +147,12 @@ h1 .accent{
   border:1px solid var(--border-h);
   border-radius:20px;
   padding:32px;
-  box-shadow:0 0 0 1px var(--border),0 24px 80px rgba(0,0,0,.4),0 0 60px var(--red-glow);
+  box-shadow:0 0 0 1px var(--border),0 8px 40px rgba(0,0,0,.08);
   animation:up .8s .1s ease both;
   transition:background .3s,border-color .3s;
   position:relative;overflow:hidden;
 }
-[data-theme="light"] .card{box-shadow:0 0 0 1px var(--border),0 8px 40px rgba(0,0,0,.08)}
+[data-theme="dark"] .card{box-shadow:0 0 0 1px var(--border),0 24px 80px rgba(0,0,0,.4),0 0 60px var(--red-glow);}
 .card::before{
   content:'';position:absolute;top:0;left:0;right:0;height:1px;
   background:linear-gradient(90deg,transparent,var(--red) 50%,transparent);
@@ -169,10 +169,10 @@ h1 .accent{
   font-size:.78rem;font-weight:600;line-height:1.5;
   margin-bottom:18px;
 }
-.alert-error{background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.25);color:#fca5a5}
-.alert-success{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);color:#86efac}
-[data-theme="light"] .alert-error{background:#fef2f2;border-color:#fecaca;color:#dc2626}
-[data-theme="light"] .alert-success{background:#f0fdf4;border-color:#bbf7d0;color:#16a34a}
+.alert-error{background:#fef2f2;border:1px solid #fecaca;color:#dc2626}
+.alert-success{background:#f0fdf4;border:1px solid #bbf7d0;color:#16a34a}
+[data-theme="dark"] .alert-error{background:rgba(220,38,38,.1);border-color:rgba(220,38,38,.25);color:#fca5a5}
+[data-theme="dark"] .alert-success{background:rgba(34,197,94,.1);border-color:rgba(34,197,94,.25);color:#86efac}
 .alert i{font-size:.85rem;margin-top:1px;flex-shrink:0}
 
 /* ── INPUT ── */
@@ -186,12 +186,12 @@ h1 .accent{
 .inp-wrap{position:relative}
 .inp{
   width:100%;padding:11px 40px 11px 14px;
-  background:var(--bg2);border:1px solid var(--border);
+  background:#fff;border:1px solid var(--border);
   border-radius:10px;font-family:'Sora',sans-serif;
   font-size:.875rem;color:var(--text);outline:none;
   transition:border .2s,box-shadow .2s;
 }
-[data-theme="light"] .inp{background:#fff}
+[data-theme="dark"] .inp{background:var(--bg2);}
 .inp:focus{border-color:var(--red);box-shadow:0 0 0 3px var(--red-soft)}
 .inp::placeholder{color:var(--text3)}
 .inp-btn{
@@ -247,8 +247,8 @@ h1 .accent{
   border-radius:16px;padding:28px 24px;
   transition:all .3s;cursor:default;position:relative;overflow:hidden;
 }
-.fc:hover{border-color:var(--border-h);transform:translateY(-4px);box-shadow:0 16px 48px rgba(0,0,0,.3)}
-[data-theme="light"] .fc:hover{box-shadow:0 8px 32px rgba(0,0,0,.08)}
+.fc:hover{border-color:var(--border-h);transform:translateY(-4px);box-shadow:0 8px 32px rgba(0,0,0,.08)}
+[data-theme="dark"] .fc:hover{box-shadow:0 16px 48px rgba(0,0,0,.3)}
 .fc::before{
   content:'';position:absolute;top:0;left:0;right:0;height:1px;
   background:linear-gradient(90deg,transparent,var(--border-h),transparent);
@@ -331,8 +331,8 @@ footer{
   </a>
   <div class="nav-right">
     <button class="theme-btn" id="themeBtn" title="Ganti tema">
-      <i class="fas fa-sun" id="themeIco"></i>
-      <span id="themeTxt">Terang</span>
+      <i class="fas fa-moon" id="themeIco"></i>
+      <span id="themeTxt">Gelap</span>
     </button>
   </div>
 </nav>
@@ -487,7 +487,7 @@ footer{
 
 <script>
 /* ── THEME ── */
-const html    = document.documentElement;
+const html     = document.documentElement;
 const themeBtn = document.getElementById('themeBtn');
 const themeIco = document.getElementById('themeIco');
 const themeTxt = document.getElementById('themeTxt');
@@ -499,7 +499,8 @@ function setTheme(t) {
   themeTxt.textContent = t === 'dark' ? 'Terang' : 'Gelap';
 }
 
-const savedTheme = localStorage.getItem('siaphukum-theme') || 'dark';
+// Default: light — hanya pakai localStorage jika sudah pernah diset sebelumnya
+const savedTheme = localStorage.getItem('siaphukum-theme') || 'light';
 setTheme(savedTheme);
 
 themeBtn.addEventListener('click', () => {
