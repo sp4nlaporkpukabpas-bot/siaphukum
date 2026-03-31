@@ -295,19 +295,77 @@
      STYLES
      ============================================================ --}}
 <style>
+    /* form-label */
     .form-label {
-        @apply block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1.5;
+        display: block;
+        font-size: 10px;
+        font-weight: 900;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 6px;
     }
+    /* form-input */
     .form-input {
-        @apply w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm outline-none
-               focus:ring-2 focus:ring-maroon-600/20 focus:border-maroon-300 transition-all;
+        display: block;
+        width: 100%;
+        background-color: #f8fafc;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 10px 16px;
+        font-size: 0.875rem;
+        color: #1e293b;
+        outline: none;
+        transition: border-color 0.15s, box-shadow 0.15s;
     }
+    .form-input::placeholder { color: #cbd5e1; }
+    .form-input:focus {
+        border-color: #9f1239;
+        box-shadow: 0 0 0 3px rgba(159,18,57,0.12);
+    }
+    /* form-input invalid */
     .form-input.is-invalid {
-        @apply border-red-300 bg-red-50/40 focus:ring-red-500/20 focus:border-red-400;
+        border-color: #fca5a5;
+        background-color: #fff5f5;
     }
+    .form-input.is-invalid:focus {
+        border-color: #f87171;
+        box-shadow: 0 0 0 3px rgba(239,68,68,0.12);
+    }
+    /* form-error */
     .form-error {
-        @apply text-[10px] text-red-500 mt-1 font-medium;
+        font-size: 10px;
+        color: #ef4444;
+        margin-top: 4px;
+        font-weight: 500;
     }
+    /* TomSelect override agar match desain */
+    .ts-wrapper .ts-control {
+        background-color: #f8fafc !important;
+        border: 1.5px solid #e2e8f0 !important;
+        border-radius: 12px !important;
+        padding: 8px 14px !important;
+        font-size: 0.875rem !important;
+        box-shadow: none !important;
+        min-height: 42px;
+    }
+    .ts-wrapper.focus .ts-control {
+        border-color: #9f1239 !important;
+        box-shadow: 0 0 0 3px rgba(159,18,57,0.12) !important;
+    }
+    .ts-wrapper .ts-control .item {
+        background: #fff1f1 !important;
+        color: #800000 !important;
+        border: 1px solid #fecaca !important;
+        border-radius: 6px !important;
+        font-size: 11px !important;
+        font-weight: 700 !important;
+        padding: 2px 8px !important;
+    }
+    .ts-wrapper .ts-control input::placeholder { color: #cbd5e1; }
+    .ts-dropdown { border-radius: 12px !important; border: 1.5px solid #e2e8f0 !important; box-shadow: 0 8px 24px rgba(0,0,0,0.08) !important; }
+    .ts-dropdown .option:hover, .ts-dropdown .option.active { background: #fff1f1 !important; color: #800000 !important; }
+    /* animations */
     @keyframes slide-in {
         from { opacity: 0; transform: translateX(1rem); }
         to   { opacity: 1; transform: translateX(0); }
