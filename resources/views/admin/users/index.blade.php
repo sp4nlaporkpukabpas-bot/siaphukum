@@ -49,7 +49,7 @@
         </button>
     </div>
 
-    {{-- Search bar sederhana (client-side) --}}
+    {{-- Search bar --}}
     <div class="px-6 sm:px-8 py-4 border-b border-slate-100 bg-slate-50/40">
         <div class="relative max-w-sm">
             <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
@@ -79,7 +79,6 @@
                     <td class="px-6 sm:px-8 py-5 text-xs font-bold text-slate-400">{{ $i + 1 }}</td>
                     <td class="px-6 sm:px-8 py-5">
                         <div class="flex items-center gap-3">
-                            {{-- Avatar inisial --}}
                             <div class="w-9 h-9 rounded-full bg-maroon-900/10 text-maroon-900 flex items-center justify-center text-xs font-black shrink-0 uppercase">
                                 {{ substr($user->name, 0, 2) }}
                             </div>
@@ -94,7 +93,7 @@
                     </td>
                     <td class="px-6 sm:px-8 py-5">
                         @if($user->activeRole)
-                            <span class="inline-flex items-center gap-1.5 bg-maroon-900/8 text-maroon-900 px-2.5 py-1 rounded-full text-[10px] font-black uppercase">
+                            <span class="inline-flex items-center gap-1.5 bg-maroon-900/10 text-maroon-900 px-2.5 py-1 rounded-full text-[10px] font-black uppercase">
                                 <span class="w-1.5 h-1.5 rounded-full bg-maroon-900 inline-block"></span>
                                 {{ $user->activeRole->display_name }}
                             </span>
@@ -113,24 +112,21 @@
                     </td>
                     <td class="px-6 sm:px-8 py-5">
                         <div class="flex items-center justify-center gap-1.5">
-                            {{-- Tombol Edit --}}
                             <button onclick="openEditModal({{ $user->toJson() }}, {{ $user->roles->pluck('id')->toJson() }})"
                                     title="Edit User"
-                                    class="group p-2 text-blue-500 hover:bg-blue-50 active:scale-95 rounded-lg transition-all">
+                                    class="p-2 text-blue-500 hover:bg-blue-50 active:scale-95 rounded-lg transition-all">
                                 <i class="fas fa-edit text-sm"></i>
                             </button>
-
-                            {{-- Tombol Hapus → trigger modal konfirmasi --}}
                             <button onclick="openDeleteModal({{ $user->id }}, '{{ addslashes($user->name) }}')"
                                     title="Hapus User"
-                                    class="group p-2 text-red-400 hover:bg-red-50 active:scale-95 rounded-lg transition-all">
+                                    class="p-2 text-red-400 hover:bg-red-50 active:scale-95 rounded-lg transition-all">
                                 <i class="fas fa-trash text-sm"></i>
                             </button>
                         </div>
                     </td>
                 </tr>
                 @empty
-                <tr id="emptyRow">
+                <tr>
                     <td colspan="6" class="px-8 py-16 text-center">
                         <div class="flex flex-col items-center gap-3 text-slate-400">
                             <i class="fas fa-users text-3xl opacity-30"></i>
@@ -143,7 +139,6 @@
             </tbody>
         </table>
 
-        {{-- Empty state saat search tidak menemukan hasil --}}
         <div id="noSearchResult" class="hidden px-8 py-12 text-center">
             <p class="text-slate-400 text-sm"><i class="fas fa-search mr-2 opacity-50"></i>Tidak ada hasil untuk pencarian ini.</p>
         </div>
@@ -160,14 +155,14 @@
 
 {{-- ============================================================
      MODAL: TAMBAH / EDIT USER
+     PENTING: id="modalUser" (bukan "userModal") agar tidak
+     bentrok dengan window.userModal yang di-expose browser.
      ============================================================ --}}
-<div id="userModal" class="fixed inset-0 z-[60] hidden overflow-y-auto">
+<div id="modalUser" class="fixed inset-0 z-[60] hidden overflow-y-auto">
     <div class="flex items-center justify-center min-h-screen p-4">
         <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="closeModal()"></div>
-
         <div class="relative bg-white rounded-3xl shadow-2xl w-full max-w-xl p-6 sm:p-8 animate-modal-in">
 
-            {{-- Header modal --}}
             <div class="flex justify-between items-start mb-6">
                 <div>
                     <h4 id="modalTitle" class="text-lg font-bold text-slate-900">User Form</h4>
@@ -184,36 +179,28 @@
 
                 <div class="grid grid-cols-2 gap-4">
 
-                    {{-- Nama --}}
                     <div class="col-span-2 sm:col-span-1">
                         <label class="form-label">Nama Lengkap <span class="text-red-400">*</span></label>
-                        <input type="text" name="name" id="in_name"
-                               class="form-input" placeholder="cth: Budi Santoso" required>
+                        <input type="text" name="name" id="in_name" class="form-input" placeholder="cth: Budi Santoso">
                         <p class="form-error hidden" id="err_name"></p>
                     </div>
 
-                    {{-- NIP --}}
                     <div class="col-span-2 sm:col-span-1">
                         <label class="form-label">NIP</label>
-                        <input type="text" name="nip" id="in_nip"
-                               class="form-input" placeholder="Opsional">
+                        <input type="text" name="nip" id="in_nip" class="form-input" placeholder="Opsional">
                         <p class="form-error hidden" id="err_nip"></p>
                     </div>
 
-                    {{-- Username --}}
                     <div>
                         <label class="form-label">Username <span class="text-red-400">*</span></label>
-                        <input type="text" name="username" id="in_username"
-                               class="form-input" placeholder="cth: budi.santoso" required autocomplete="off">
+                        <input type="text" name="username" id="in_username" class="form-input" placeholder="cth: budi.santoso" autocomplete="off">
                         <p class="form-error hidden" id="err_username"></p>
                     </div>
 
-                    {{-- Password --}}
                     <div>
                         <label class="form-label">Password</label>
                         <div class="relative">
-                            <input type="password" name="password" id="in_password"
-                                   class="form-input pr-10" placeholder="Min. 6 karakter" autocomplete="new-password">
+                            <input type="password" name="password" id="in_password" class="form-input pr-10" placeholder="Min. 6 karakter" autocomplete="new-password">
                             <button type="button" onclick="togglePassword()"
                                     class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-maroon-900 transition-colors">
                                 <i id="toggleIcon" class="fas fa-eye text-xs"></i>
@@ -223,7 +210,6 @@
                         <p class="form-error hidden" id="err_password"></p>
                     </div>
 
-                    {{-- Role Tersedia (Tom Select) --}}
                     <div class="col-span-2">
                         <label class="form-label">Role Tersedia <span class="text-red-400">*</span></label>
                         <select name="roles[]" id="in_roles" multiple placeholder="Pilih satu atau lebih role..." autocomplete="off">
@@ -234,7 +220,6 @@
                         <p class="form-error hidden" id="err_roles"></p>
                     </div>
 
-                    {{-- Role Aktif (default) --}}
                     <div class="col-span-2">
                         <label class="form-label text-maroon-900">
                             <i class="fas fa-star text-[8px] mr-1 text-maroon-400"></i>
@@ -253,7 +238,6 @@
                     </div>
                 </div>
 
-                {{-- Footer button --}}
                 <div class="flex gap-3 mt-7">
                     <button type="button" onclick="closeModal()"
                             class="flex-1 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 active:scale-95 font-bold text-sm transition-all text-slate-600">
@@ -273,8 +257,9 @@
 
 {{-- ============================================================
      MODAL: KONFIRMASI HAPUS
+     id="modalDelete" (bukan "deleteModal") — alasan sama.
      ============================================================ --}}
-<div id="deleteModal" class="fixed inset-0 z-[70] hidden overflow-y-auto">
+<div id="modalDelete" class="fixed inset-0 z-[70] hidden overflow-y-auto">
     <div class="flex items-center justify-center min-h-screen p-4">
         <div class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm" onclick="closeDeleteModal()"></div>
         <div class="relative bg-white rounded-3xl shadow-2xl w-full max-w-sm p-7 text-center animate-modal-in">
@@ -285,7 +270,7 @@
             <p class="text-sm text-slate-500 mb-1">Anda akan menghapus akun:</p>
             <p id="deleteTargetName" class="text-sm font-bold text-red-600 mb-4">—</p>
             <p class="text-xs text-slate-400 mb-6 bg-red-50 border border-red-100 rounded-xl p-3">
-                Tindakan ini <strong>tidak dapat dibatalkan</strong>. Semua data yang terkait dengan akun ini akan ikut terhapus.
+                Tindakan ini <strong>tidak dapat dibatalkan</strong>. Semua data terkait akun ini akan ikut terhapus.
             </p>
             <form id="deleteForm" method="POST">
                 @csrf
@@ -323,7 +308,6 @@
     .form-error {
         @apply text-[10px] text-red-500 mt-1 font-medium;
     }
-
     @keyframes slide-in {
         from { opacity: 0; transform: translateX(1rem); }
         to   { opacity: 1; transform: translateX(0); }
@@ -332,11 +316,8 @@
         from { opacity: 0; transform: translateY(1rem) scale(0.98); }
         to   { opacity: 1; transform: translateY(0) scale(1); }
     }
-    .animate-slide-in  { animation: slide-in 0.3s ease; }
-    .animate-modal-in  { animation: modal-in 0.25s ease; }
-
-    /* Auto dismiss flash */
-    #flashNotif { animation: slide-in 0.3s ease; }
+    .animate-slide-in { animation: slide-in 0.3s ease; }
+    .animate-modal-in { animation: modal-in 0.25s ease; }
 </style>
 
 
@@ -345,44 +326,56 @@
      ============================================================ --}}
 <script>
 // ---------------------------------------------------------------
-// Inisialisasi Tom Select
+// ROOT CAUSE FIX:
+// Browser secara otomatis men-expose elemen dengan "id" sebagai
+// properti global window. Jadi jika ada <div id="userModal"> maka
+// window.userModal sudah ada. Ketika kita tulis:
+//   const userModal = document.getElementById('userModal');
+// JavaScript (mode strict / TDZ) melempar ReferenceError karena
+// const di-hoist ke scope tapi belum terinisialisasi saat
+// fungsi lain (yang dipanggil via onclick) mencoba mengaksesnya.
+//
+// Solusi: ganti id HTML dan nama variabel JS agar tidak tabrakan.
+//   <div id="modalUser">   → elUserModal
+//   <div id="modalDelete"> → elDeleteModal
+//   <form id="userForm">   → elUserForm   (form = reserved-ish)
 // ---------------------------------------------------------------
+
+// Tom Select
 let roleSelect = new TomSelect('#in_roles', {
     plugins: ['remove_button'],
     onItemAdd:    () => syncActiveRole(),
     onItemRemove: () => syncActiveRole(),
 });
 
-// ---------------------------------------------------------------
-// DOM refs
-// ---------------------------------------------------------------
-const userModal   = document.getElementById('userModal');
-const deleteModal = document.getElementById('deleteModal');
-const form        = document.getElementById('userForm');
-const activeSelect = document.getElementById('in_active_role');
-const passInput   = document.getElementById('in_password');
-const passHint    = document.getElementById('passHint');
-const toggleIcon  = document.getElementById('toggleIcon');
-const submitBtn   = document.getElementById('submitBtn');
-const submitText  = document.getElementById('submitText');
+// DOM refs — semua pakai prefix "el" supaya bebas konflik
+const elUserModal    = document.getElementById('modalUser');
+const elDeleteModal  = document.getElementById('modalDelete');
+const elUserForm     = document.getElementById('userForm');
+const elActiveSelect = document.getElementById('in_active_role');
+const elPassInput    = document.getElementById('in_password');
+const elPassHint     = document.getElementById('passHint');
+const elToggleIcon   = document.getElementById('toggleIcon');
+const elSubmitBtn    = document.getElementById('submitBtn');
+const elSubmitText   = document.getElementById('submitText');
 
 // ---------------------------------------------------------------
 // Toggle password visibility
 // ---------------------------------------------------------------
 function togglePassword() {
-    const isPass = passInput.type === 'password';
-    passInput.type = isPass ? 'text' : 'password';
-    toggleIcon.classList.toggle('fa-eye',      !isPass);
-    toggleIcon.classList.toggle('fa-eye-slash', isPass);
+    const isPass = elPassInput.type === 'password';
+    elPassInput.type = isPass ? 'text' : 'password';
+    elToggleIcon.classList.toggle('fa-eye',       !isPass);
+    elToggleIcon.classList.toggle('fa-eye-slash',  isPass);
 }
 
 // ---------------------------------------------------------------
-// Sync dropdown "Role Aktif" berdasarkan pilihan di Tom Select
+// Sync dropdown "Role Aktif" berdasarkan pilihan Tom Select
 // ---------------------------------------------------------------
 function syncActiveRole(savedActiveId = null) {
     const selectedIds      = roleSelect.getValue();
-    const currentActiveVal = activeSelect.value;
-    activeSelect.innerHTML = '';
+    const currentActiveVal = elActiveSelect.value;
+    elActiveSelect.innerHTML = '';
 
     if (selectedIds.length > 0) {
         selectedIds.forEach((roleId, index) => {
@@ -391,22 +384,22 @@ function syncActiveRole(savedActiveId = null) {
             opt.value = roleId;
             opt.text  = src ? src.text : roleId;
 
-            if      (savedActiveId && roleId == savedActiveId)                               opt.selected = true;
-            else if (!savedActiveId && roleId == currentActiveVal)                           opt.selected = true;
-            else if (!savedActiveId && !currentActiveVal && index === 0)                     opt.selected = true;
+            if      (savedActiveId && roleId == savedActiveId)           opt.selected = true;
+            else if (!savedActiveId && roleId == currentActiveVal)       opt.selected = true;
+            else if (!savedActiveId && !currentActiveVal && index === 0) opt.selected = true;
 
-            activeSelect.appendChild(opt);
+            elActiveSelect.appendChild(opt);
         });
     } else {
         const placeholder = document.createElement('option');
         placeholder.text  = '— Pilih role terlebih dahulu —';
         placeholder.value = '';
-        activeSelect.appendChild(placeholder);
+        elActiveSelect.appendChild(placeholder);
     }
 }
 
 // ---------------------------------------------------------------
-// Client-side validation
+// Validasi client-side
 // ---------------------------------------------------------------
 function clearErrors() {
     document.querySelectorAll('.form-error').forEach(el => {
@@ -429,16 +422,15 @@ function validateForm() {
 
     const name     = document.getElementById('in_name').value.trim();
     const username = document.getElementById('in_username').value.trim();
-    const password = passInput.value;
+    const password = elPassInput.value;
     const roles    = roleSelect.getValue();
     const isEdit   = document.getElementById('methodField').innerHTML.includes('PUT');
 
-    if (!name)     { showError('name', 'Nama lengkap wajib diisi.'); valid = false; }
-    if (!username) { showError('username', 'Username wajib diisi.'); valid = false; }
-    if (!isEdit && !password) { showError('password', 'Password wajib diisi saat tambah user.'); valid = false; }
-    if (isEdit && password && password.length < 6) { showError('password', 'Password minimal 6 karakter.'); valid = false; }
-    if (!isEdit && password && password.length < 6) { showError('password', 'Password minimal 6 karakter.'); valid = false; }
-    if (roles.length === 0) { showError('roles', 'Pilih minimal satu role.'); valid = false; }
+    if (!name)                             { showError('name',     'Nama lengkap wajib diisi.'); valid = false; }
+    if (!username)                         { showError('username', 'Username wajib diisi.'); valid = false; }
+    if (!isEdit && !password)              { showError('password', 'Password wajib diisi saat tambah user.'); valid = false; }
+    if (password && password.length < 6)  { showError('password', 'Password minimal 6 karakter.'); valid = false; }
+    if (roles.length === 0)               { showError('roles',    'Pilih minimal satu role.'); valid = false; }
 
     return valid;
 }
@@ -446,12 +438,11 @@ function validateForm() {
 // ---------------------------------------------------------------
 // Submit dengan loading state
 // ---------------------------------------------------------------
-form.addEventListener('submit', function(e) {
+elUserForm.addEventListener('submit', function(e) {
     if (!validateForm()) { e.preventDefault(); return; }
-
-    submitBtn.disabled = true;
-    submitText.textContent = 'Menyimpan...';
-    submitBtn.querySelector('i').className = 'fas fa-spinner fa-spin text-xs';
+    elSubmitBtn.disabled     = true;
+    elSubmitText.textContent = 'Menyimpan...';
+    elSubmitBtn.querySelector('i').className = 'fas fa-spinner fa-spin text-xs';
 });
 
 // ---------------------------------------------------------------
@@ -459,26 +450,26 @@ form.addEventListener('submit', function(e) {
 // ---------------------------------------------------------------
 function openAddModal() {
     clearErrors();
-    form.reset();
+    elUserForm.reset();
     roleSelect.clear();
 
     document.getElementById('modalTitle').textContent    = 'Tambah User Baru';
     document.getElementById('modalSubtitle').textContent = 'Isi data lengkap untuk membuat akun pegawai baru.';
     document.getElementById('methodField').innerHTML     = '';
 
-    passInput.type  = 'password';
-    passInput.value = '12345678';
-    passHint.textContent = '* Default: 12345678. Klik ikon mata untuk melihat.';
-    toggleIcon.className = 'fas fa-eye text-xs';
+    elPassInput.type       = 'password';
+    elPassInput.value      = '12345678';
+    elPassHint.textContent = '* Default: 12345678. Klik ikon mata untuk melihat.';
+    elToggleIcon.className = 'fas fa-eye text-xs';
 
-    submitText.textContent = 'Simpan Data';
-    submitBtn.querySelector('i').className = 'fas fa-save text-xs';
-    submitBtn.disabled = false;
+    elSubmitText.textContent = 'Simpan Data';
+    elSubmitBtn.querySelector('i').className = 'fas fa-save text-xs';
+    elSubmitBtn.disabled = false;
 
-    form.action = "{{ route('users.store') }}";
+    elUserForm.action = "{{ route('users.store') }}";
     syncActiveRole();
 
-    userModal.classList.remove('hidden');
+    elUserModal.classList.remove('hidden');
     setTimeout(() => document.getElementById('in_name').focus(), 100);
 }
 
@@ -487,22 +478,22 @@ function openAddModal() {
 // ---------------------------------------------------------------
 function openEditModal(user, userRoles) {
     clearErrors();
-    form.reset();
+    elUserForm.reset();
 
     document.getElementById('modalTitle').textContent    = 'Edit Data User';
     document.getElementById('modalSubtitle').textContent = `Mengubah akun: ${user.name}`;
     document.getElementById('methodField').innerHTML     = `<input type="hidden" name="_method" value="PUT">`;
 
-    passInput.type  = 'password';
-    passInput.value = '';
-    passHint.textContent = '* Kosongkan jika tidak ingin mengubah password.';
-    toggleIcon.className = 'fas fa-eye text-xs';
+    elPassInput.type       = 'password';
+    elPassInput.value      = '';
+    elPassHint.textContent = '* Kosongkan jika tidak ingin mengubah password.';
+    elToggleIcon.className = 'fas fa-eye text-xs';
 
-    submitText.textContent = 'Perbarui Data';
-    submitBtn.querySelector('i').className = 'fas fa-save text-xs';
-    submitBtn.disabled = false;
+    elSubmitText.textContent = 'Perbarui Data';
+    elSubmitBtn.querySelector('i').className = 'fas fa-save text-xs';
+    elSubmitBtn.disabled = false;
 
-    form.action = `/admin/users/${user.id}`;
+    elUserForm.action = `/admin/users/${user.id}`;
 
     document.getElementById('in_name').value     = user.name     ?? '';
     document.getElementById('in_nip').value      = user.nip      ?? '';
@@ -511,22 +502,22 @@ function openEditModal(user, userRoles) {
     roleSelect.setValue(userRoles);
     syncActiveRole(user.active_role_id);
 
-    userModal.classList.remove('hidden');
+    elUserModal.classList.remove('hidden');
     setTimeout(() => document.getElementById('in_name').focus(), 100);
 }
 
 // ---------------------------------------------------------------
-// Tutup modal utama
+// Tutup modal user
 // ---------------------------------------------------------------
 function closeModal() {
-    userModal.classList.add('hidden');
+    elUserModal.classList.add('hidden');
     clearErrors();
-    form.reset();
+    elUserForm.reset();
     roleSelect.clear();
     syncActiveRole();
-    passInput.type       = 'password';
-    toggleIcon.className = 'fas fa-eye text-xs';
-    submitBtn.disabled   = false;
+    elPassInput.type       = 'password';
+    elToggleIcon.className = 'fas fa-eye text-xs';
+    elSubmitBtn.disabled   = false;
 }
 
 // ---------------------------------------------------------------
@@ -535,22 +526,22 @@ function closeModal() {
 function openDeleteModal(userId, userName) {
     document.getElementById('deleteTargetName').textContent = userName;
     document.getElementById('deleteForm').action = `/admin/users/${userId}`;
-    deleteModal.classList.remove('hidden');
+    elDeleteModal.classList.remove('hidden');
 }
 
 function closeDeleteModal() {
-    deleteModal.classList.add('hidden');
+    elDeleteModal.classList.add('hidden');
 }
 
 // ---------------------------------------------------------------
 // Search / filter tabel (client-side)
 // ---------------------------------------------------------------
 function filterTable(q) {
-    const rows       = document.querySelectorAll('.user-row');
-    const noResult   = document.getElementById('noSearchResult');
-    const countEl    = document.getElementById('visibleCount');
-    const keyword    = q.trim().toLowerCase();
-    let visible      = 0;
+    const rows     = document.querySelectorAll('.user-row');
+    const noResult = document.getElementById('noSearchResult');
+    const countEl  = document.getElementById('visibleCount');
+    const keyword  = q.trim().toLowerCase();
+    let visible    = 0;
 
     rows.forEach(row => {
         const match = !keyword || row.dataset.search.includes(keyword);
@@ -563,20 +554,19 @@ function filterTable(q) {
 }
 
 // ---------------------------------------------------------------
-// Keyboard: Escape menutup modal aktif
+// Escape menutup modal aktif
 // ---------------------------------------------------------------
 document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') {
-        if (!userModal.classList.contains('hidden'))   closeModal();
-        if (!deleteModal.classList.contains('hidden')) closeDeleteModal();
-    }
+    if (e.key !== 'Escape') return;
+    if (!elUserModal.classList.contains('hidden'))   closeModal();
+    if (!elDeleteModal.classList.contains('hidden')) closeDeleteModal();
 });
 
 // ---------------------------------------------------------------
 // Auto-dismiss flash notification setelah 5 detik
 // ---------------------------------------------------------------
-const flash = document.getElementById('flashNotif');
-if (flash) setTimeout(() => flash?.remove(), 5000);
+const elFlash = document.getElementById('flashNotif');
+if (elFlash) setTimeout(() => elFlash.remove(), 5000);
 </script>
 
 @endsection
