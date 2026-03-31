@@ -322,33 +322,27 @@
 
 
 {{-- ============================================================
-     SCRIPTS
+     SCRIPTS — TomSelect CDN (wajib dimuat sebelum script utama)
      ============================================================ --}}
-<script>
-// ---------------------------------------------------------------
-// ROOT CAUSE FIX:
-// Browser secara otomatis men-expose elemen dengan "id" sebagai
-// properti global window. Jadi jika ada <div id="userModal"> maka
-// window.userModal sudah ada. Ketika kita tulis:
-//   const userModal = document.getElementById('userModal');
-// JavaScript (mode strict / TDZ) melempar ReferenceError karena
-// const di-hoist ke scope tapi belum terinisialisasi saat
-// fungsi lain (yang dipanggil via onclick) mencoba mengaksesnya.
-//
-// Solusi: ganti id HTML dan nama variabel JS agar tidak tabrakan.
-//   <div id="modalUser">   → elUserModal
-//   <div id="modalDelete"> → elDeleteModal
-//   <form id="userForm">   → elUserForm   (form = reserved-ish)
-// ---------------------------------------------------------------
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.min.css">
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
 
-// Tom Select
+<script>
+// Semua inisialisasi dibungkus DOMContentLoaded agar:
+// 1. TomSelect sudah tersedia
+// 2. Semua elemen DOM sudah ada
+// 3. Tidak ada TDZ (Temporal Dead Zone) pada const yang diakses
+//    oleh onclick handler sebelum script selesai diparse.
+document.addEventListener('DOMContentLoaded', function () {
+
+// Tom Select — inisialisasi setelah DOM ready
 let roleSelect = new TomSelect('#in_roles', {
     plugins: ['remove_button'],
     onItemAdd:    () => syncActiveRole(),
     onItemRemove: () => syncActiveRole(),
 });
 
-// DOM refs — semua pakai prefix "el" supaya bebas konflik
+// DOM refs
 const elUserModal    = document.getElementById('modalUser');
 const elDeleteModal  = document.getElementById('modalDelete');
 const elUserForm     = document.getElementById('userForm');
@@ -358,6 +352,15 @@ const elPassHint     = document.getElementById('passHint');
 const elToggleIcon   = document.getElementById('toggleIcon');
 const elSubmitBtn    = document.getElementById('submitBtn');
 const elSubmitText   = document.getElementById('submitText');
+
+// Expose fungsi ke window agar onclick="..." di HTML bisa memanggil
+window.openAddModal    = openAddModal;
+window.openEditModal   = openEditModal;
+window.openDeleteModal = openDeleteModal;
+window.closeModal      = closeModal;
+window.closeDeleteModal= closeDeleteModal;
+window.togglePassword  = togglePassword;
+window.filterTable     = filterTable;
 
 // ---------------------------------------------------------------
 // Toggle password visibility
@@ -567,6 +570,8 @@ document.addEventListener('keydown', e => {
 // ---------------------------------------------------------------
 const elFlash = document.getElementById('flashNotif');
 if (elFlash) setTimeout(() => elFlash.remove(), 5000);
+
+}); // end DOMContentLoaded
 </script>
 
 @endsection
