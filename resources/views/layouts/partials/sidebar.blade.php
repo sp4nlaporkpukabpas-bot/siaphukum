@@ -112,6 +112,13 @@
                     </details>
                 </div>
             </div>
+
+            <div>
+                <a href="{{ route('access-logs.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all group {{ request()->routeIs('dashboard') ? 'bg-white/10 text-gold-400' : 'text-white/60 hover:bg-white/5' }}">
+                    <div class="w-5 flex justify-center text-sm"><i class="fas fa-cog text-gold-400/70"></i></div>
+                    <span class="text-sm font-bold tracking-wide">Akses Log</span>
+                </a>
+            </div>
         @endif
     </nav>
 

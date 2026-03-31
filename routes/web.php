@@ -9,6 +9,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RekapRegisterController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\AccessLogController; // ← TAMBAHAN
 
 /*
 |--------------------------------------------------------------------------
@@ -76,6 +77,9 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('users', UserController::class)->except(['create', 'edit', 'show']);
         Route::get('/roles', [RoleController::class, 'index'])->name('roles.index');
         Route::put('/roles/{id}', [RoleController::class, 'update'])->name('roles.update');
+
+        // ── LOG AKSES DOKUMEN ─────────────────────────────────────────────── ← TAMBAHAN
+        Route::get('/access-logs', [AccessLogController::class, 'index'])->name('access-logs.index');
     });
 
     // ── LOGOUT ───────────────────────────────────────────────────────────────
