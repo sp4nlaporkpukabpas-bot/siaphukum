@@ -195,6 +195,11 @@
     <span id="batchToastText">Menyiapkan arsip ZIP...</span>
 </div>
 
+{{-- Inject download URL ke JS via route helper agar selalu sinkron dengan web.php --}}
+<script>
+    const singleDownloadUrl = "{{ route('documents.download', ['document' => 0]) }}";
+</script>
+
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const searchInput     = document.getElementById('searchInput');
@@ -285,9 +290,9 @@ document.addEventListener('DOMContentLoaded', function () {
         const checked = getCheckedBoxes();
         if (!checked.length) return;
 
-        // 1 dokumen → langsung download biasa (tidak perlu ZIP)
+        // 1 dokumen → gunakan route helper yang sudah di-inject, bukan URL hardcoded
         if (checked.length === 1) {
-            window.location.href = `{{ url('documents') }}/${checked[0].value}/download`;
+            window.location.href = singleDownloadUrl.replace('/0/', `/${checked[0].value}/`);
             return;
         }
 
@@ -303,7 +308,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         showToast(`Menyiapkan ZIP untuk ${checked.length} dokumen...`);
         batchForm.submit();
-        setTimeout(hideToast, 5000); // hilang setelah download mulai
+        setTimeout(hideToast, 5000);
     });
 
     function showToast(msg) {

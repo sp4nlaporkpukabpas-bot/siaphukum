@@ -98,7 +98,7 @@
 
         <div class="divide-y divide-slate-50" id="docList">
             @forelse($documents as $doc)
-            {{-- 
+            {{--
                 SATU checkbox per dokumen, disimpan di data-attribute row.
                 Mobile & desktop layout berbagi nilai dari checkbox yang SAMA
                 via JavaScript — tidak ada duplikasi elemen input.
@@ -258,6 +258,11 @@
     <span id="batchToastText">Menyiapkan arsip ZIP...</span>
 </div>
 
+{{-- Inject download URL ke JS via route helper agar selalu sinkron dengan web.php --}}
+<script>
+    const singleDownloadUrl = "{{ route('documents.download', ['document' => 0]) }}";
+</script>
+
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const searchInput     = document.getElementById('searchInput');
@@ -277,15 +282,11 @@ document.addEventListener('DOMContentLoaded', function () {
     const totalCount      = rows.length;
 
     // ── HELPER: satu checkbox nyata per row (ada di blok mobile) ─────────────
-    // Mengambil checkbox berdasarkan data-id row, bukan querySelectorAll yang
-    // bisa mengambil duplikat dari kedua blok mobile+desktop.
     function getCheckboxForRow(row) {
-        // Checkbox asli selalu ada di blok mobile (.doc-checkbox)
         return row.querySelector('.doc-checkbox');
     }
 
     function getAllCheckboxes() {
-        // Hanya ambil checkbox dari baris yang tidak hidden
         return rows
             .filter(r => !r.classList.contains('hidden'))
             .map(r => getCheckboxForRow(r))
@@ -297,7 +298,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // ── PROXY VISUAL DESKTOP ─────────────────────────────────────────────────
-    // Span di desktop bukan <input>, jadi kita sync tampilannya ke checkbox asli.
     function syncProxyVisual(checkbox) {
         const docId = checkbox.value;
         const proxy = document.querySelector(`.desktop-checkbox-proxy[data-for="${docId}"]`);
@@ -400,9 +400,9 @@ document.addEventListener('DOMContentLoaded', function () {
         const checked = getCheckedBoxes();
         if (!checked.length) return;
 
-        // 1 dokumen → download langsung tanpa ZIP
+        // 1 dokumen → gunakan route helper yang sudah di-inject, bukan URL hardcoded
         if (checked.length === 1) {
-            window.location.href = `{{ url('documents') }}/${checked[0].value}/download`;
+            window.location.href = singleDownloadUrl.replace('/0/', `/${checked[0].value}/`);
             return;
         }
 
