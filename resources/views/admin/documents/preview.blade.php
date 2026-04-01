@@ -107,35 +107,32 @@
         // --- Mode: 'text' | 'logo' | 'both' ---
         mode: 'both',
 
-        // --- Teks watermark (bisa diisi dari Blade / auth user) ---
+        // --- Teks watermark ---
         lines: [
-            'PRATINJAU',                        // Baris 1: label tetap
-            '{{ auth()->user()->name ?? "TAMU" }}',  // Baris 2: nama pengguna login
-            '{{ $document->document_number }}', // Baris 3: nomor dokumen
+            'SIAP-HUKUM',
+            'KPU KABUPATEN PASURUAN',
         ],
 
         // --- URL logo (opsional, untuk mode 'logo' atau 'both') ---
-        // Ganti dengan asset logo instansi Anda, contoh:
-        //   logoUrl: "{{ asset('images/logo.png') }}",
-        logoUrl: null,   // null = tidak pakai logo
-        logoWidth: 80,   // lebar logo dalam pixel di canvas
+        logoUrl: null,
+        logoWidth: 80,
         logoOpacity: 0.08,
 
         // --- Tampilan teks ---
-        fontFamily: 'monospace',
-        fontSizePx: 13,
-        textColor: 'rgba(100, 20, 20, 0.18)',   // merah maroon transparan
+        fontFamily: 'Georgia, serif',
+        fontSizePx: 22,
+        textColor: 'rgba(100, 20, 20, 0.18)',
         fontWeight: 'bold',
 
         // --- Pola tile ---
-        tileWidth: 260,   // jarak horizontal antar watermark
-        tileHeight: 130,  // jarak vertikal antar watermark
-        rotateDeg: -35,   // sudut kemiringan (derajat)
+        tileWidth: 380,
+        tileHeight: 180,
+        rotateDeg: -35,
 
-        // --- Animasi: watermark bergerak perlahan agar susah diblok --
-        animated: true,
-        speedX: 0.15,  // pixel per frame arah X
-        speedY: 0.08,  // pixel per frame arah Y
+        // --- Animasi dimatikan ---
+        animated: false,
+        speedX: 0,
+        speedY: 0,
     };
 
     (function initWatermark(cfg) {
