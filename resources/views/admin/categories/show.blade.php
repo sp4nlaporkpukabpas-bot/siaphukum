@@ -96,7 +96,7 @@
             <div class="col-span-1 text-right">Aksi</div>
         </div>
 
-        <div class="divide-y divide-slate-50" id="docList">
+        <div class="divide-y divide-slate-50 overflow-y-auto" id="docList" style="max-height: 600px;">
             @forelse($documents as $doc)
             {{--
                 SATU checkbox per dokumen, disimpan di data-attribute row.
@@ -171,7 +171,7 @@
                             <i class="fas fa-file-pdf text-sm"></i>
                         </div>
                         <div class="min-w-0">
-                            <p class="font-bold text-sm text-slate-800 leading-snug truncate group-hover:text-maroon-900 transition-colors">
+                            <p class="font-bold text-sm text-slate-800 leading-snug whitespace-normal break-words group-hover:text-maroon-900 transition-colors">
                                 {{ $doc->name }}
                             </p>
                             @if($doc->parent_id)
@@ -231,11 +231,34 @@
             </button>
         </div>
 
-        {{-- Footer --}}
-        <div class="border-t border-slate-100 px-6 py-3 bg-slate-50/50 flex items-center justify-between">
+        {{-- Footer + Pagination --}}
+        <div class="border-t border-slate-100 px-6 py-3 bg-slate-50/50 flex flex-col sm:flex-row items-center justify-between gap-3">
             <p class="text-xs text-slate-400 font-medium">
                 Total: <span id="docCountFooter" class="font-black text-slate-600">{{ $documents->count() }}</span> dokumen
+                &mdash; Hal. <span id="pageInfo" class="font-black text-slate-600">1</span>
             </p>
+
+            {{-- Pagination --}}
+            <div class="flex items-center gap-1.5" id="paginationControls">
+                <button id="btnFirst" onclick="goPage(1)"
+                        class="w-8 h-8 rounded-lg border border-slate-200 bg-white text-slate-500 text-xs flex items-center justify-center hover:bg-maroon-900 hover:text-white hover:border-maroon-900 transition-all disabled:opacity-30 disabled:cursor-not-allowed">
+                    <i class="fas fa-angles-left"></i>
+                </button>
+                <button id="btnPrev" onclick="goPage(currentPage - 1)"
+                        class="w-8 h-8 rounded-lg border border-slate-200 bg-white text-slate-500 text-xs flex items-center justify-center hover:bg-maroon-900 hover:text-white hover:border-maroon-900 transition-all disabled:opacity-30 disabled:cursor-not-allowed">
+                    <i class="fas fa-angle-left"></i>
+                </button>
+                <div id="pageNumbers" class="flex items-center gap-1"></div>
+                <button id="btnNext" onclick="goPage(currentPage + 1)"
+                        class="w-8 h-8 rounded-lg border border-slate-200 bg-white text-slate-500 text-xs flex items-center justify-center hover:bg-maroon-900 hover:text-white hover:border-maroon-900 transition-all disabled:opacity-30 disabled:cursor-not-allowed">
+                    <i class="fas fa-angle-right"></i>
+                </button>
+                <button id="btnLast" onclick="goPage(totalPages)"
+                        class="w-8 h-8 rounded-lg border border-slate-200 bg-white text-slate-500 text-xs flex items-center justify-center hover:bg-maroon-900 hover:text-white hover:border-maroon-900 transition-all disabled:opacity-30 disabled:cursor-not-allowed">
+                    <i class="fas fa-angles-right"></i>
+                </button>
+            </div>
+
             @if($permission->pivot->can_download)
             <p class="text-[10px] text-slate-400 hidden sm:block">Centang dokumen lalu klik "Unduh ZIP" untuk batch download</p>
             @endif
@@ -281,12 +304,100 @@ document.addEventListener('DOMContentLoaded', function () {
     const rows            = Array.from(document.querySelectorAll('.document-row'));
     const totalCount      = rows.length;
 
+    // ── PAGINATION STATE ─────────────────────────────────────────────────────
+    const PER_PAGE = 10;
+    let currentPage = 1;
+    let totalPages  = 1;
+    let filteredRows = [...rows]; // rows yang lolos filter search
+
+    window.currentPage = currentPage;
+    window.totalPages  = totalPages;
+
+    function renderPage() {
+        // Sembunyikan semua dulu
+        rows.forEach(r => r.classList.add('hidden'));
+
+        if (filteredRows.length === 0) {
+            noResults.classList.remove('hidden');
+            document.getElementById('paginationControls').classList.add('invisible');
+            return;
+        }
+
+        noResults.classList.add('hidden');
+
+        totalPages = Math.ceil(filteredRows.length / PER_PAGE);
+        window.totalPages = totalPages;
+
+        // Clamp currentPage
+        if (currentPage < 1) currentPage = 1;
+        if (currentPage > totalPages) currentPage = totalPages;
+        window.currentPage = currentPage;
+
+        const start = (currentPage - 1) * PER_PAGE;
+        const end   = Math.min(start + PER_PAGE, filteredRows.length);
+        filteredRows.slice(start, end).forEach(r => r.classList.remove('hidden'));
+
+        // Scroll docList ke atas saat ganti halaman
+        document.getElementById('docList').scrollTop = 0;
+
+        // Update info
+        const displayN = filteredRows.length;
+        if (docCount)       docCount.textContent       = displayN;
+        if (docCountFooter) docCountFooter.textContent = displayN;
+
+        const query = searchInput.value.toLowerCase().trim();
+        resultInfo.textContent = query
+            ? `Menampilkan ${displayN} dari ${totalCount} dokumen`
+            : '';
+
+        document.getElementById('pageInfo').textContent = `${currentPage} / ${totalPages}`;
+
+        // Render nomor halaman
+        renderPageNumbers();
+
+        // State tombol navigasi
+        document.getElementById('paginationControls').classList.remove('invisible');
+        document.getElementById('btnFirst').disabled = currentPage === 1;
+        document.getElementById('btnPrev').disabled  = currentPage === 1;
+        document.getElementById('btnNext').disabled  = currentPage === totalPages;
+        document.getElementById('btnLast').disabled  = currentPage === totalPages;
+
+        updateSelectAllState();
+    }
+
+    function renderPageNumbers() {
+        const container = document.getElementById('pageNumbers');
+        container.innerHTML = '';
+
+        // Tampilkan max 5 nomor halaman di sekitar currentPage
+        let startP = Math.max(1, currentPage - 2);
+        let endP   = Math.min(totalPages, startP + 4);
+        if (endP - startP < 4) startP = Math.max(1, endP - 4);
+
+        for (let p = startP; p <= endP; p++) {
+            const btn = document.createElement('button');
+            btn.textContent = p;
+            btn.onclick = () => goPage(p);
+            btn.className = p === currentPage
+                ? 'w-8 h-8 rounded-lg bg-maroon-900 text-white text-xs font-black border border-maroon-900'
+                : 'w-8 h-8 rounded-lg border border-slate-200 bg-white text-slate-600 text-xs font-bold hover:bg-slate-100 transition-all';
+            container.appendChild(btn);
+        }
+    }
+
+    window.goPage = function (p) {
+        currentPage = p;
+        window.currentPage = p;
+        renderPage();
+    };
+
     // ── HELPER: satu checkbox nyata per row (ada di blok mobile) ─────────────
     function getCheckboxForRow(row) {
         return row.querySelector('.doc-checkbox');
     }
 
     function getAllCheckboxes() {
+        // Hanya row yang sedang tampil (halaman aktif, tidak hidden)
         return rows
             .filter(r => !r.classList.contains('hidden'))
             .map(r => getCheckboxForRow(r))
@@ -367,24 +478,23 @@ document.addEventListener('DOMContentLoaded', function () {
     // ── SEARCH ───────────────────────────────────────────────────────────────
     function filterRows() {
         const query = searchInput.value.toLowerCase().trim();
-        let found = 0;
 
-        rows.forEach(row => {
-            const match = !query || (row.dataset.search || '').includes(query);
-            row.classList.toggle('hidden', !match);
-            if (match) found++;
+        filteredRows = rows.filter(row => {
+            return !query || (row.dataset.search || '').includes(query);
         });
 
-        const displayN = query ? found : totalCount;
-        if (docCount)       docCount.textContent       = displayN;
-        if (docCountFooter) docCountFooter.textContent = displayN;
-
-        noResults.classList.toggle('hidden', found > 0 || !query);
         clearBtn.classList.toggle('hidden', !searchInput.value);
-        resultInfo.textContent = query ? `Menampilkan ${found} dari ${totalCount} dokumen` : '';
 
+        // Reset ke halaman 1 setiap kali search berubah
+        currentPage = 1;
+        window.currentPage = 1;
+
+        renderPage();
         updateSelectAllState();
     }
+
+    // Inisialisasi pertama kali
+    filterRows();
 
     searchInput.addEventListener('input', filterRows);
     clearBtn?.addEventListener('click', () => { searchInput.value = ''; filterRows(); searchInput.focus(); });
