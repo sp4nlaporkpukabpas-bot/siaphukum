@@ -234,7 +234,7 @@ class DocumentController extends Controller
         $request->validate([
             'name'            => 'required|string|max:255',
             'category_id'     => 'required|exists:categories,id',
-            'document_number' => 'required|unique:documents,document_number',
+            'document_number' => 'required|string|max:255',
             'document_date'   => 'required|date',
             'file'            => 'required|mimes:pdf,doc,docx,xls,xlsx|max:10240',
         ]);
@@ -269,7 +269,7 @@ class DocumentController extends Controller
         $request->validate([
             'name'            => 'required|string|max:255',
             'category_id'     => 'required|exists:categories,id',
-            'document_number' => 'required|unique:documents,document_number,' . $document->id,
+            'document_number' => 'required|string|max:255',
             'document_date'   => 'required|date',
             'file'            => 'nullable|mimes:pdf,doc,docx,xls,xlsx|max:10240',
         ]);
