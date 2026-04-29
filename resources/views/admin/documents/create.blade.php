@@ -108,17 +108,18 @@
                 <label class="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2">
                     <i class="fas fa-file-pdf text-maroon-800 mr-1"></i> Berkas Digital
                 </label>
-                <label id="drop-area" 
-                       class="flex flex-col items-center justify-center w-full h-36 border-2 border-dashed border-slate-200 rounded-xl bg-slate-50 hover:bg-maroon-50/20 hover:border-maroon-300 transition-all cursor-pointer group">
-                    <div id="upload-placeholder" class="flex flex-col items-center text-center px-4">
+                <div id="drop-area"
+                     class="flex flex-col items-center justify-center w-full h-36 border-2 border-dashed border-slate-200 rounded-xl bg-slate-50 hover:bg-maroon-50/20 hover:border-maroon-300 transition-all cursor-pointer group relative"
+                     onclick="document.getElementById('file-input').click()">
+                    <div id="upload-placeholder" class="flex flex-col items-center text-center px-4 pointer-events-none">
                         <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm mb-2 group-hover:scale-110 transition-transform">
                             <i id="upload-icon" class="fas fa-upload text-maroon-800 text-sm"></i>
                         </div>
-                        <p id="upload-text" class="text-xs font-bold text-slate-500">Klik untuk pilih berkas</p>
-                        <p class="text-[10px] text-slate-400 mt-1 font-semibold uppercase tracking-wider">PDF, DOCX, XLSX — Maks. 10MB</p>
+                        <p id="upload-text" class="text-xs font-bold text-slate-500">Klik atau seret berkas ke sini</p>
+                        <p id="upload-hint" class="text-[10px] text-slate-400 mt-1 font-semibold uppercase tracking-wider">PDF, DOCX, XLSX — Maks. 10MB</p>
                     </div>
                     <input type="file" id="file-input" name="file" required class="hidden" accept=".pdf,.doc,.docx,.xls,.xlsx">
-                </label>
+                </div>
             </div>
         </div>
 
@@ -137,29 +138,107 @@
 </div>
 
 <script>
-    document.getElementById('file-input').addEventListener('change', function (e) {
-        const file = e.target.files[0];
-        const dropArea  = document.getElementById('drop-area');
-        const uploadText = document.getElementById('upload-text');
-        const uploadIcon = document.getElementById('upload-icon');
+    const dropArea  = document.getElementById('drop-area');
+    const fileInput = document.getElementById('file-input');
+    const uploadText = document.getElementById('upload-text');
+    const uploadHint = document.getElementById('upload-hint');
+    const uploadIcon = document.getElementById('upload-icon');
 
-        if (file) {
-            dropArea.classList.replace('border-slate-200', 'border-emerald-400');
-            dropArea.classList.remove('bg-slate-50');
-            dropArea.classList.add('bg-emerald-50/40');
-            uploadText.textContent = file.name;
-            uploadText.classList.replace('text-slate-500', 'text-emerald-600');
-            uploadIcon.classList.replace('fa-upload', 'fa-circle-check');
-            uploadIcon.classList.replace('text-maroon-800', 'text-emerald-600');
+    const ACCEPTED_TYPES = [
+        'application/pdf',
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'application/vnd.ms-excel',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    ];
+
+    function applyFileState(file) {
+        dropArea.classList.replace('border-slate-200', 'border-emerald-400');
+        dropArea.classList.remove('bg-slate-50');
+        dropArea.classList.add('bg-emerald-50/40');
+        uploadText.textContent = file.name;
+        uploadText.classList.replace('text-slate-500', 'text-emerald-600');
+        uploadIcon.classList.replace('fa-upload', 'fa-circle-check');
+        uploadIcon.classList.replace('text-maroon-800', 'text-emerald-600');
+        uploadHint.textContent = (file.size / 1024 / 1024).toFixed(2) + ' MB';
+    }
+
+    function resetState() {
+        dropArea.classList.replace('border-emerald-400', 'border-slate-200');
+        dropArea.classList.remove('bg-emerald-50/40');
+        dropArea.classList.add('bg-slate-50');
+        uploadText.textContent = 'Klik atau seret berkas ke sini';
+        uploadText.classList.replace('text-emerald-600', 'text-slate-500');
+        uploadIcon.classList.replace('fa-circle-check', 'fa-upload');
+        uploadIcon.classList.replace('text-emerald-600', 'text-maroon-800');
+        uploadHint.textContent = 'PDF, DOCX, XLSX — Maks. 10MB';
+    }
+
+    function setDragOver(active) {
+        if (active) {
+            dropArea.classList.add('border-maroon-400', 'bg-maroon-50/30', 'scale-[1.01]');
+            dropArea.classList.remove('border-slate-200');
         } else {
-            dropArea.classList.replace('border-emerald-400', 'border-slate-200');
-            dropArea.classList.add('bg-slate-50');
-            dropArea.classList.remove('bg-emerald-50/40');
-            uploadText.textContent = 'Klik untuk pilih berkas';
-            uploadText.classList.replace('text-emerald-600', 'text-slate-500');
-            uploadIcon.classList.replace('fa-circle-check', 'fa-upload');
-            uploadIcon.classList.replace('text-emerald-600', 'text-maroon-800');
+            dropArea.classList.remove('border-maroon-400', 'bg-maroon-50/30', 'scale-[1.01]');
+            if (!fileInput.files.length) dropArea.classList.add('border-slate-200');
         }
+    }
+
+    // File input change
+    fileInput.addEventListener('change', function () {
+        if (this.files[0]) applyFileState(this.files[0]);
+        else resetState();
     });
+
+    // Drag events
+    ['dragenter', 'dragover'].forEach(evt =>
+        dropArea.addEventListener(evt, function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            setDragOver(true);
+        })
+    );
+
+    ['dragleave', 'dragend'].forEach(evt =>
+        dropArea.addEventListener(evt, function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            setDragOver(false);
+        })
+    );
+
+    dropArea.addEventListener('drop', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        setDragOver(false);
+
+        const file = e.dataTransfer.files[0];
+        if (!file) return;
+
+        if (!ACCEPTED_TYPES.includes(file.type) && !file.name.match(/\.(pdf|docx?|xlsx?)$/i)) {
+            uploadText.textContent = 'Format berkas tidak didukung!';
+            uploadText.classList.add('text-red-500');
+            setTimeout(resetState, 2000);
+            return;
+        }
+
+        if (file.size > 10 * 1024 * 1024) {
+            uploadText.textContent = 'Ukuran berkas melebihi 10MB!';
+            uploadText.classList.add('text-red-500');
+            setTimeout(resetState, 2000);
+            return;
+        }
+
+        // Inject file ke input
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        fileInput.files = dt.files;
+        applyFileState(file);
+    });
+
+    // Prevent browser default drop on window
+    ['dragover', 'drop'].forEach(evt =>
+        window.addEventListener(evt, e => e.preventDefault())
+    );
 </script>
 @endsection
